@@ -1,0 +1,287 @@
+// ==UserScript==
+// @name         InstagramDownloader
+// @namespace    http://tampermonkey.net/
+// @version      0.4
+// @description  try to take over the world!
+// @author       You
+// @match        https://www.instagram.com/*
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=instagram.com
+// @grant        none
+// ==/UserScript==
+
+(function () {
+  'use strict';
+  function download_blob(blob: Blob, account_str: string, file_name: string, type_name: string) {
+    var today: Date = new Date();
+    var timestamp: string = today.getUTCFullYear().toString() + (today.getUTCMonth() + 1).toString() + today.getUTCDate().toString();
+
+    var file_path: string = 'ig_bot_' + account_str + '_' + timestamp + '_' + type_name + '_' + file_name + '.txt';
+
+    var url: string = URL.createObjectURL(blob);
+    console.log('Download:', file_path);
+    var link_e: HTMLAnchorElement = document.createElement("a");
+    link_e.href = url;
+    link_e.download = file_path;
+    document.body.appendChild(link_e);
+    link_e.click();
+    document.body.removeChild(link_e);
+  }
+  function post_next_btn(article: HTMLElement) {
+    var next_btns: Array<HTMLElement> = Array.from(article.querySelectorAll('button._afxw'));
+    var filted_next_btns: Array<HTMLElement> = [];
+    for (let btn of next_btns) {
+      if (btn.classList.length == 1) {
+        filted_next_btns.push(btn);
+      }
+    }
+    return filted_next_btns;
+  }
+  function parse_post(e: MouseEvent) {
+    console.log('Parse Post');
+    const btn: HTMLElement = (e.target as HTMLElement);
+    const article = btn.parentElement;
+    var loaded_imgs: Array<HTMLElement> = [];
+    var loaded_vids: Array<HTMLElement> = [];
+    var n_loaded_imgs: number = 0;
+    var n_loaded_vids: number = 0;
+    var img_srcs: string[] = [];
+    var vid_srcs: string[] = [];
+    var filted_next_btns: Array<HTMLElement> = [];
+    if (article != null) {
+      loaded_imgs = Array.from(article.querySelectorAll('._aagv')); // 多張照片
+      loaded_vids = Array.from(article.querySelectorAll('._acam')); // 多張影片
+      filted_next_btns = post_next_btn(article);
+      n_loaded_imgs = loaded_imgs.length;
+      n_loaded_vids = loaded_vids.length;
+    }
+    if (n_loaded_imgs > 0 || n_loaded_vids > 0) {
+      if (n_loaded_imgs > 0) {
+        var img = loaded_imgs[0].querySelector('img');
+        if (img != null && !img_srcs.includes(img.src)) {
+          img_srcs.push(img.src);
+        }
+      }
+      if (n_loaded_vids > 0) {
+        var vid = loaded_vids[0].querySelector('video');
+        if (vid != null && !vid_srcs.includes(vid.src)) {
+          vid_srcs.push(vid.src);
+        }
+      }
+    }
+    var parseTimes: number = 0;
+    var parseId = setInterval(() => {
+      if ((n_loaded_imgs >= 1 || n_loaded_vids >= 1) && filted_next_btns.length > 0 && parseTimes < 10) {
+        if (n_loaded_imgs >= 1) {
+          var img = loaded_imgs[n_loaded_imgs - 1].querySelector('img');
+          if (img != null && !img_srcs.includes(img.src)) {
+            img_srcs.push(img.src);
+          }
+        }
+        if (n_loaded_vids >= 1) {
+          var vid = loaded_vids[n_loaded_vids - 1].querySelector('video')
+          if (vid != null && !vid_srcs.includes(vid.src)) {
+            vid_srcs.push(vid.src);
+          };
+        }
+        filted_next_btns[filted_next_btns.length - 1].click();
+
+        if (article != null) {
+          loaded_imgs = Array.from(article.querySelectorAll('._aagv'));
+          loaded_vids = Array.from(article.querySelectorAll('._acam'));
+          filted_next_btns = post_next_btn(article);
+          n_loaded_imgs = loaded_imgs.length;
+          n_loaded_vids = loaded_vids.length;
+        }
+      }
+      else {
+        let account_e = article?.parentElement?.querySelector('div._aasi div._aaqy a');
+        var account_str: string = '';
+        if (account_e != null && account_e.textContent != null) {
+          account_str = account_e.textContent;
+        }
+        var file_name: string = window.location.pathname.split('/').filter(n => n).join('_');
+        if (file_name == '' && article != null && article.parentElement != null) {
+          var page_links: HTMLAnchorElement[] = Array.from(article.parentElement.querySelectorAll('._ab8w ._ae1h ._ae5q a.x1i10hfl'));
+          if (page_links != null) {
+            var page_url = page_links[page_links.length -1];
+            if (page_url != null){
+              var page_url_split = page_url.href.split('/').filter(n => n);
+              file_name = page_url_split[page_url_split.length - 1];
+            }
+          }
+        }
+        var blob: Blob | null = null;
+        if (img_srcs.length > 0) {
+          blob = new Blob([img_srcs.join('\n')], { type: "text/plain;charset=utf-8" });
+          download_blob(blob, account_str, file_name, 'imgs');
+        }
+        if (vid_srcs.length > 0) {
+          blob = new Blob([vid_srcs.join('\n')], { type: "text/plain;charset=utf-8" });
+          download_blob(blob, account_str, file_name, 'vids');
+        }
+        clearInterval(parseId);
+      }
+    }, 250)
+  }
+  function parse_stories() {
+    console.log('Parse Stories');
+    let account_e = document.querySelector('div._aasi header._ac0k div._ac0o div._ab8w a.xjbqb8w');
+    var account_str: string = '';
+    if (location.pathname.match('/stories/highlights/*')) {
+      if (account_e != null && account_e.textContent != null) {
+        let acct_btn = account_e.querySelector('a');
+        if (acct_btn != null) {
+          let acct_url_split = acct_btn.href.split('/').filter(e => e);
+          account_str = acct_url_split[acct_url_split.length - 1];
+        }
+      }
+    } else {
+      if (account_e != null && account_e.textContent != null) {
+        account_str = account_e.textContent;
+      }
+    }
+    var curr_story = document.querySelector('div._aasi');
+    if (curr_story != null) {
+      var blob: Blob | null = null;
+      var path_name: string = '';
+      var path_split: string[] = [];
+      var file_name: string = '';
+      var img = curr_story.querySelector('img');
+      var src: string;
+      if (img != null) {
+        src = img.src;
+        blob = new Blob([src], { type: "text/plain;charset=utf-8" });
+        path_name = new URL(src).pathname;
+        path_split = path_name.split('/');
+        file_name = path_split[path_split.length - 1];
+        download_blob(blob, account_str, file_name, 'img');
+      }
+      var vid = curr_story.querySelector('video');
+      var vid_src: HTMLSourceElement | null = curr_story.querySelector('video source');
+      if (vid != null) {
+        if (vid_src != null) {
+          src = vid_src.src;
+        }
+        else {
+          src = vid.src;
+        }
+        blob = new Blob([src], { type: "text/plain;charset=utf-8" });
+        path_name = new URL(src).pathname;
+        path_split = path_name.split('/');
+        file_name = path_split[path_split.length - 1];
+        download_blob(blob, account_str, file_name, 'vid');
+      }
+    }
+  }
+  let mainPageIntervalID: NodeJS.Timer | null = null;
+  function listArticles(articles: Array<HTMLElement> | null) {
+    if (articles !== null && articles.length > 0) {
+      for (var article of articles) {
+        var area = article.querySelector('._aatk');
+        if (area != undefined && area != null) {
+          var area_download_btn = area.querySelector('#download');
+          if (area_download_btn == null) {
+            var button = document.createElement("Button");
+            button.id = 'download';
+            button.innerHTML = "Download";
+            button.style.top = '20px';
+            button.style.right = '20px';
+            button.style.width = '120px';
+            button.style.height = '30px';
+            button.style.position = 'absolute';
+            button.style.zIndex = '9999';
+            button.style.border = 'border: 1px #88EEFF solid';
+            button.style.borderRadius = '8px';
+            button.style.textAlign = 'center';      
+            button.onclick = (e) => {
+              parse_post(e);
+            }
+            area.appendChild(button);
+          }
+        }
+      }
+    }
+  }
+  function mainPageArticles() {
+    var articles: HTMLElement[] = Array.from(document.querySelectorAll('article._aatb'));
+    listArticles(articles);
+  }
+  function onUrlChange() {
+    var curr_url = location.href;
+    var url_path = location.pathname;
+    var area: Element | null = null;
+    var urlChangeIntervalID: NodeJS.Timer | null = null;
+    var button = document.createElement("Button");
+    button.innerHTML = "Download";
+    button.id = 'download';
+    if (url_path == '/') {
+      console.log('Change to Main Page!');
+      mainPageArticles();
+    }
+    else if (url_path.match('/stories/*') != undefined) {
+      console.log('Change to Stories Page!');
+      button.style.top = '70px';
+      button.style.right = '20px';
+      button.style.width = '120px';
+      button.style.height = '30px';
+      button.style.position = 'absolute';
+      button.style.zIndex = '9999';
+      button.style.border = 'border: 1px #88EEFF solid';
+      button.style.borderRadius = '8px';
+      button.style.textAlign = 'center';
+
+      button.onclick = () => {
+        parse_stories();
+      }
+      urlChangeIntervalID = setInterval(() => {
+        var btn: HTMLElement | null = document.querySelector('._aa64 button');
+        if (btn != null) {
+          btn.click();
+        }
+        area = document.querySelector('div._aasi');
+        if (area != undefined && area != null) {
+          area.appendChild(button);
+          if (urlChangeIntervalID != null) {
+            clearInterval(urlChangeIntervalID);
+          }
+        }
+      }, 1000);
+    }
+    else if (url_path.match('/p/*') != undefined) {
+      console.log('Change to Post Page!');
+      button.style.top = '20px';
+      button.style.right = '20px';
+      button.style.width = '120px';
+      button.style.height = '30px';
+      button.style.position = 'absolute';
+      button.style.zIndex = '9999';
+      button.style.border = 'border: 1px #88EEFF solid';
+      button.style.borderRadius = '8px';
+      button.style.textAlign = 'center';
+      button.onclick = (e) => {
+        parse_post(e);
+      }
+      urlChangeIntervalID = setInterval(() => {
+        area = document.querySelector('article._aatb ._aatk');
+        if (area != undefined && area != null) {
+          area.appendChild(button);
+          if (urlChangeIntervalID != null) {
+            clearInterval(urlChangeIntervalID);
+          }
+        }
+      }, 1000);
+    }
+  }
+  var last_url = location.href;
+  var observer = new MutationObserver(() => {
+    if (location.href !== last_url) {
+      last_url = location.href;
+      onUrlChange();
+    }
+  })
+  observer.observe(document, { subtree: true, childList: true });
+  if (location.pathname == '/') {
+    console.log('Main Page!');
+    mainPageIntervalID = setInterval(mainPageArticles, 100);
+  }
+})();

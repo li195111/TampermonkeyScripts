@@ -1,0 +1,1 @@
+npx tsc js\eyny.ts --lib ES6,DOM

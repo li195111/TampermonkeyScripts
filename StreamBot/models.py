@@ -181,8 +181,8 @@ class IURLs(object):
     # Eyny: '[繁體中文]_[合集] [AT-X] [無修正] [無刪減]'
     # IG: 'wendy__624'
     media_name = '_'.join(media_time_split[:-1])
-    if media_type == MediaType.VID or media_type == MediaType.VIDS:
-      media_name = media_name.replace('.', '')
+    # if media_type == MediaType.VID or media_type == MediaType.VIDS:
+    #   media_name = media_name.replace('.', '')
     # Eyny: '20221014'
     # IG: '20221014'
     # download_time_str = media_time_split[-1]

@@ -103,8 +103,8 @@
         if (file_name == '' && article != null && article.parentElement != null) {
           var page_links: HTMLAnchorElement[] = Array.from(article.parentElement.querySelectorAll('._ab8w ._ae1h ._ae5q a.x1i10hfl'));
           if (page_links != null) {
-            var page_url = page_links[page_links.length -1];
-            if (page_url != null){
+            var page_url = page_links[page_links.length - 1];
+            if (page_url != null) {
               var page_url_split = page_url.href.split('/').filter(n => n);
               file_name = page_url_split[page_url_split.length - 1];
             }
@@ -125,7 +125,7 @@
   }
   function parse_stories() {
     console.log('Parse Stories');
-    let account_e = document.querySelector('div._aasi header._ac0k div._ac0o div._ab8w a.xjbqb8w');
+    let account_e: HTMLAnchorElement | null = document.querySelector('div._ac0b header._ac0k div._ac0o div._ab8w a.xjbqb8w');
     var account_str: string = '';
     if (location.pathname.match('/stories/highlights/*')) {
       if (account_e != null && account_e.textContent != null) {
@@ -134,13 +134,17 @@
           let acct_url_split = acct_btn.href.split('/').filter(e => e);
           account_str = acct_url_split[acct_url_split.length - 1];
         }
+        else {
+          let acct_url_split = account_e.href.split('/').filter(e => e);
+          account_str = acct_url_split[acct_url_split.length - 1];
+        }
       }
     } else {
       if (account_e != null && account_e.textContent != null) {
         account_str = account_e.textContent;
       }
     }
-    var curr_story = document.querySelector('div._aasi');
+    var curr_story = document.querySelector('div._ac0b');
     if (curr_story != null) {
       var blob: Blob | null = null;
       var path_name: string = '';
@@ -192,7 +196,7 @@
             button.style.zIndex = '9999';
             button.style.border = 'border: 1px #88EEFF solid';
             button.style.borderRadius = '8px';
-            button.style.textAlign = 'center';      
+            button.style.textAlign = 'center';
             button.onclick = (e) => {
               parse_post(e);
             }
@@ -238,7 +242,7 @@
         if (btn != null) {
           btn.click();
         }
-        area = document.querySelector('div._aasi');
+        area = document.querySelector('div._ac0b');
         if (area != undefined && area != null) {
           area.appendChild(button);
           if (urlChangeIntervalID != null) {

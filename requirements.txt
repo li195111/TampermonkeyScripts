@@ -2,4 +2,4 @@ jupyter
 Pillow
 numpy
 scipy
-dlib
+# dlib

@@ -5,3 +5,4 @@ __pycache__/
 *.jpg
 *.svg
 node_modules/
+ConvertLogs/

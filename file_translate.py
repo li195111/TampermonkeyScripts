@@ -1,8 +1,8 @@
 import os
-from datetime import datetime
-from pathlib import Path
 import shutil
+from datetime import datetime
 from multiprocessing import Process
+from pathlib import Path
 from typing import Dict, List, Optional
 
 
@@ -75,61 +75,9 @@ def setup_trans_size(inp_txt: str, src_path: Path, src_folder_names: List[str],
   return calc_trans_size(trans_names, src_path, src_folder_paths_size)
 
 
-if __name__ == '__main__':
-  # TODO: Get File Infos
-  # name = 'Instagram'
-  name = 'Study'
-  src_path = Path(f'F:/{name}')
-  dst_path = Path(f'D:/{name}')
-  free_size = shutil.disk_usage(dst_path).free
-
-  dst_folders = os.listdir(dst_path)
-  dst_folders.sort()
-
-  dst_folder_paths_size: Dict[Path, int] = {}
-  dst_folder_paths = []
-  for folder_name in dst_folders:
-    folder_path = dst_path.joinpath(folder_name)
-    dst_folder_paths_size[folder_path] = folder_size(folder_path)
-
-  src_folder_names = os.listdir(src_path)
-  src_folder_names.sort()
-
-  src_folder_paths_size: Dict[Path, int] = {}
-  src_folder_paths = []
-  for folder_name in src_folder_names:
-    folder_path = src_path.joinpath(folder_name)
-    src_folder_paths_size[folder_path] = folder_size(folder_path)
-
-  # Check if translate needed
-  trans_names = []
-  for src_folder_path, src_size in src_folder_paths_size.items():
-    folder_name = src_folder_path.name
-    if folder_name in dst_folders:
-      dst_size = dst_folder_paths_size[dst_path.joinpath(folder_name)]
-      if src_size > dst_size:
-        trans_names.append(folder_name)
-    else:
-      trans_names.append(folder_name)
-
-  # TODO: Setup Translate Files
-  ttl_n = len(trans_names)
-
-  ttl_size, show, trans_names = calc_trans_size(trans_names, src_path,
-                                                src_folder_paths_size)
-  if ttl_size > free_size:
-    print('空間不足')
-    exit(0)
-
-  # ttl_size, show, trans_names = setup_trans_size(f'總數: {ttl_n} 請輸入移轉數量:',
-  #                                                src_path, src_folder_names,
-  #                                                src_folder_paths_size)
-
-  # while ttl_size > free_size:
-  #   ttl_size, show, trans_names = setup_trans_size(f'總數: {ttl_n} 空間不足 請重新輸入:',
-  #                                                  src_path, src_folder_names,
-  #                                                  src_folder_paths_size)
-
+def trans_files(ttl_n: int, trans_names: List[str], src_path: Path,
+                dst_path: Path, src_folder_paths_size: Dict[Path, int],
+                dst_folder_paths_size: Dict[Path, int]):
   # TODO: Translate Files
   threads_map: Dict[str, MoveProcess] = {}
   while ttl_n > 0:
@@ -154,3 +102,63 @@ if __name__ == '__main__':
             threads_map.pop(folder_name)
             trans_names.remove(folder_name)
     ttl_n = len(trans_names)
+
+
+if __name__ == '__main__':
+  # TODO: Get File Infos
+  # name = 'Instagram'
+  name = 'Study'
+  src_path = Path(f'F:/{name}')
+  dst_path = Path(f'D:/{name}')
+  if src_path.exists():
+    free_size = shutil.disk_usage(dst_path).free
+
+    dst_folders = os.listdir(dst_path)
+    dst_folders.sort()
+
+    dst_folder_paths_size: Dict[Path, int] = {}
+    dst_folder_paths = []
+    for folder_name in dst_folders:
+      folder_path = dst_path.joinpath(folder_name)
+      dst_folder_paths_size[folder_path] = folder_size(folder_path)
+
+    src_folder_names = os.listdir(src_path)
+    src_folder_names.sort()
+
+    src_folder_paths_size: Dict[Path, int] = {}
+    src_folder_paths = []
+    for folder_name in src_folder_names:
+      folder_path = src_path.joinpath(folder_name)
+      src_folder_paths_size[folder_path] = folder_size(folder_path)
+
+    # Check if translate needed
+    trans_names = []
+    for src_folder_path, src_size in src_folder_paths_size.items():
+      folder_name = src_folder_path.name
+      if folder_name in dst_folders:
+        dst_size = dst_folder_paths_size[dst_path.joinpath(folder_name)]
+        if src_size > dst_size:
+          trans_names.append(folder_name)
+      else:
+        trans_names.append(folder_name)
+
+    # TODO: Setup Translate Files
+    ttl_n = len(trans_names)
+
+    ttl_size, show, trans_names = calc_trans_size(trans_names, src_path,
+                                                  src_folder_paths_size)
+    if ttl_size > free_size:
+      print('空間不足')
+      exit(0)
+
+    # ttl_size, show, trans_names = setup_trans_size(f'總數: {ttl_n} 請輸入移轉數量:',
+    #                                                src_path, src_folder_names,
+    #                                                src_folder_paths_size)
+
+    # while ttl_size > free_size:
+    #   ttl_size, show, trans_names = setup_trans_size(f'總數: {ttl_n} 空間不足 請重新輸入:',
+    #                                                  src_path, src_folder_names,
+    #                                                  src_folder_paths_size)
+
+    trans_files(ttl_n, trans_names, src_path, dst_path, src_folder_paths_size,
+                dst_folder_paths_size)

@@ -49,7 +49,7 @@
     var filted_next_btns: Array<HTMLElement> = [];
     if (article != null) {
       loaded_imgs = Array.from(article.querySelectorAll('._aagv')); // 多張照片
-      loaded_vids = Array.from(article.querySelectorAll('._acam')); // 多張影片
+      loaded_vids = Array.from(article.querySelectorAll('.xg10s4p')); // 多張影片
       filted_next_btns = post_next_btn(article);
       n_loaded_imgs = loaded_imgs.length;
       n_loaded_vids = loaded_vids.length;
@@ -87,7 +87,7 @@
 
         if (article != null) {
           loaded_imgs = Array.from(article.querySelectorAll('._aagv'));
-          loaded_vids = Array.from(article.querySelectorAll('._acam'));
+          loaded_vids = Array.from(article.querySelectorAll('.xg10s4p'));
           filted_next_btns = post_next_btn(article);
           n_loaded_imgs = loaded_imgs.length;
           n_loaded_vids = loaded_vids.length;

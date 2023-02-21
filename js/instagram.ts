@@ -30,9 +30,7 @@
     var next_btns: Array<HTMLElement> = Array.from(article.querySelectorAll('button._afxw'));
     var filted_next_btns: Array<HTMLElement> = [];
     for (let btn of next_btns) {
-      if (btn.classList.length == 1) {
-        filted_next_btns.push(btn);
-      }
+      filted_next_btns.push(btn);
     }
     return filted_next_btns;
   }
@@ -275,12 +273,48 @@
         }
       }, 1000);
     }
+    else if (url_path.match('/*/')) {
+      console.log('Personal Page!');
+      console.log('All Posts');
+      scrollToEnd();
+    }
   }
+  var posts: HTMLAnchorElement[];
+  var allPosts: string[] = [];
+  var lastScrollHeight = document.body.scrollHeight;
+  var scrollIntervalID: NodeJS.Timer;
+  var scrollTimeoutCounts = 0;
+  function scrollToEnd() {
+    scrollIntervalID = setInterval(() => {
+      // Get All Posts
+      posts = Array.from(document.querySelectorAll('.x78zum5 div._aa_y article ._aabd a'));
+      posts.map(p => allPosts.push(p.href));
+      allPosts = allPosts.filter((v, i, a) => a.indexOf(v) === i);
+      // Scroll Page
+      // window.scrollTo(0, document.body.scrollHeight);
+      // if (lastScrollHeight < document.body.scrollHeight) {
+      //   scrollTimeoutCounts = 0;
+      //   lastScrollHeight = document.body.scrollHeight;
+      // } else {
+      //   scrollTimeoutCounts += 1;
+      //   if (scrollTimeoutCounts > 10 * 4) {
+      //     clearInterval(scrollIntervalID);
+      //   }
+      // }
+      console.log('Posts:', allPosts.length);
+    }, 1600);
+  }
+
   var last_url = location.href;
+  var onece = true;
   var observer = new MutationObserver(() => {
     if (location.href !== last_url) {
       last_url = location.href;
       onUrlChange();
+    }
+    if (onece) {
+      onUrlChange();
+      onece = false;
     }
   })
   observer.observe(document, { subtree: true, childList: true });

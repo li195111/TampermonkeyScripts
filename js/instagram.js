@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstagramDownloader
 // @namespace    http://tampermonkey.net/
-// @version      0.4
+// @version      0.5
 // @description  try to take over the world!
 // @author       You
 // @match        https://www.instagram.com/*
@@ -122,24 +122,18 @@
     }
     function parse_stories() {
         console.log('Parse Stories');
-        var account_e = document.querySelector('div._ac0b header._ac0k div._ac0o div._ab8w a.xjbqb8w');
+        var account_e = document.querySelector('div._ac0b header._ac0k div._ac0o div.x9f619');
         var account_str = '';
-        if (location.pathname.match('/stories/highlights/*')) {
-            if (account_e != null && account_e.textContent != null) {
-                var acct_btn = account_e.querySelector('a');
-                if (acct_btn != null) {
+        if (account_e != null && account_e.textContent != null) {
+            var acct_btn = account_e.querySelector('a');
+            if (acct_btn != null && acct_btn.textContent != null) {
+                if (location.pathname.match('/stories/highlights/*')) {
                     var acct_url_split = acct_btn.href.split('/').filter(function (e) { return e; });
                     account_str = acct_url_split[acct_url_split.length - 1];
                 }
                 else {
-                    var acct_url_split = account_e.href.split('/').filter(function (e) { return e; });
-                    account_str = acct_url_split[acct_url_split.length - 1];
+                    account_str = acct_btn.textContent;
                 }
-            }
-        }
-        else {
-            if (account_e != null && account_e.textContent != null) {
-                account_str = account_e.textContent;
             }
         }
         var curr_story = document.querySelector('div._ac0b');
@@ -175,7 +169,6 @@
             }
         }
     }
-    var mainPageIntervalID = null;
     function listArticles(articles) {
         if (articles !== null && articles.length > 0) {
             for (var _i = 0, articles_1 = articles; _i < articles_1.length; _i++) {
@@ -207,7 +200,11 @@
     }
     function mainPageArticles() {
         var articles = Array.from(document.querySelectorAll('article._aatb'));
-        listArticles(articles);
+        var articleDetectorID = setInterval(function () {
+            articles = Array.from(document.querySelectorAll('article._aatb'));
+            console.log("Detect : ".concat(articles.length, " Articles"));
+            listArticles(articles);
+        }, 1000);
     }
     function onUrlChange() {
         var curr_url = location.href;
@@ -275,35 +272,35 @@
         }
         else if (url_path.match('/*/')) {
             console.log('Personal Page!');
-            console.log('All Posts');
-            scrollToEnd();
+            // console.log('All Posts');
+            // scrollToEnd();
         }
     }
-    var posts;
-    var allPosts = [];
-    var lastScrollHeight = document.body.scrollHeight;
-    var scrollIntervalID;
-    var scrollTimeoutCounts = 0;
-    function scrollToEnd() {
-        scrollIntervalID = setInterval(function () {
-            // Get All Posts
-            posts = Array.from(document.querySelectorAll('.x78zum5 div._aa_y article ._aabd a'));
-            posts.map(function (p) { return allPosts.push(p.href); });
-            allPosts = allPosts.filter(function (v, i, a) { return a.indexOf(v) === i; });
-            // Scroll Page
-            // window.scrollTo(0, document.body.scrollHeight);
-            // if (lastScrollHeight < document.body.scrollHeight) {
-            //   scrollTimeoutCounts = 0;
-            //   lastScrollHeight = document.body.scrollHeight;
-            // } else {
-            //   scrollTimeoutCounts += 1;
-            //   if (scrollTimeoutCounts > 10 * 4) {
-            //     clearInterval(scrollIntervalID);
-            //   }
-            // }
-            console.log('Posts:', allPosts.length);
-        }, 1600);
-    }
+    // var posts: HTMLAnchorElement[];
+    // var allPosts: string[] = [];
+    // var lastScrollHeight = document.body.scrollHeight;
+    // var scrollIntervalID: NodeJS.Timer;
+    // var scrollTimeoutCounts = 0;
+    // function scrollToEnd() {
+    //   scrollIntervalID = setInterval(() => {
+    //     // Get All Posts
+    //     posts = Array.from(document.querySelectorAll('.x78zum5 div._aa_y article ._aabd a'));
+    //     posts.map(p => allPosts.push(p.href));
+    //     allPosts = allPosts.filter((v, i, a) => a.indexOf(v) === i);
+    //     Scroll Page
+    //     window.scrollTo(0, document.body.scrollHeight);
+    //     if (lastScrollHeight < document.body.scrollHeight) {
+    //       scrollTimeoutCounts = 0;
+    //       lastScrollHeight = document.body.scrollHeight;
+    //     } else {
+    //       scrollTimeoutCounts += 1;
+    //       if (scrollTimeoutCounts > 10 * 4) {
+    //         clearInterval(scrollIntervalID);
+    //       }
+    //     }
+    //     console.log('Posts:', allPosts.length);
+    //   }, 1600);
+    // }
     var last_url = location.href;
     var onece = true;
     var observer = new MutationObserver(function () {
@@ -319,6 +316,6 @@
     observer.observe(document, { subtree: true, childList: true });
     if (location.pathname == '/') {
         console.log('Main Page!');
-        mainPageIntervalID = setInterval(mainPageArticles, 100);
+        mainPageArticles();
     }
 })();

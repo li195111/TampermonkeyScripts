@@ -3,6 +3,7 @@ import logging
 import os
 import shutil
 import time
+from datetime import datetime, timedelta
 from typing import List
 
 import pandas as pd
@@ -161,6 +162,7 @@ class URLDownloadBot(IURLDownloadBot):
   def searching(self):
     for media_type in MediaType:
       self.search_files(media_type)
+    return len(self.queue)
 
   def clean_threads(self, force: bool = False):
     for item in self.queue:
@@ -211,10 +213,11 @@ class URLDownloadBot(IURLDownloadBot):
   def run(self):
     self.log('Start Downloader')
     current_item = None
+    st = datetime.now()
     try:
       self.log('Searching ...')
-      while True:
-        self.searching()
+
+      while self.searching() > 0:
 
         for current_item in self.queue:
           if current_item.state == FileState.DOWNLOAD or current_item.state == FileState.FINISHED:
@@ -224,9 +227,12 @@ class URLDownloadBot(IURLDownloadBot):
             continue
           self.process_item(current_item)
 
-        # Update Threads Log
-        info_str = f'\33[KThreads: {self.thread_size}, Queues: {self.queue_size}'
-        self.queue_infos(info_str)
+        ct = datetime.now()
+        running_secs = (ct - st).seconds
+        if running_secs > 0 and running_secs % 30 == 0:
+          # Update Threads Log
+          info_str = f'\33[KThreads: {self.thread_size}, Queues: {self.queue_size}'
+          self.queue_infos(info_str)
 
         for current_item in self.queue:
           if current_item.state == FileState.DOWNLOAD and current_item.is_finished:
@@ -239,8 +245,8 @@ class URLDownloadBot(IURLDownloadBot):
         for current_item in self.remove_queue:
           if os.path.exists(current_item.file_path):
             os.remove(current_item.file_path)
-
-          self.queue.remove(current_item)
+          if current_item in self.queue:
+            self.queue.remove(current_item)
         for current_item in self.queue:
           if current_item.state == FileState.FINISHED:
             if os.path.exists(current_item.file_path):

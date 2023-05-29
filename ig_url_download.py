@@ -2,8 +2,8 @@ from StreamBot import URLDownloadBot, BotType, setup_logger
 
 if __name__ == '__main__':
   log_dir = './logs'
-  src_dirs = ['C:/Users/a0983/Downloads/','G:/Download/']
-  dst_dir = 'F:/Instagram'
+  src_dirs = ['C:/Users/LIDESKTOP/Downloads/','G:/Download/']
+  dst_dir = 'G:/Others/Instagram'
   setup_logger(log_dir)
   for src_dir in src_dirs:
     bot = URLDownloadBot(BotType.IG,

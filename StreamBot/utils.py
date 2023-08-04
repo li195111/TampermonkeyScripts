@@ -7,7 +7,7 @@ from datetime import datetime
 from .enums import FileSizeLevel
 
 
-def setup_logger(save_dir: str = './logs'):
+def setup_logger(save_dir: str = './logs', debug: bool = False):
   os.makedirs(save_dir, exist_ok=True)
   formatter = logging.Formatter('%(asctime)s | %(levelname)s | %(message)s')
   logger_name = os.path.basename(__file__)
@@ -21,9 +21,9 @@ def setup_logger(save_dir: str = './logs'):
 
   stream_hdl = logging.StreamHandler(sys.stdout)
   stream_hdl.setFormatter(formatter)
-  stream_hdl.setLevel(logging.INFO)
+  stream_hdl.setLevel(logging.DEBUG if debug else logging.INFO)
 
-  logging.basicConfig(level=logging.INFO, handlers=[stream_hdl])
+  logging.basicConfig(level=logging.DEBUG, handlers=[stream_hdl])
 
 
 def error_msg(err):

@@ -9,5 +9,5 @@ if __name__ == '__main__':
                        src_dir,
                        dst_dir,
                        max_queue=10,
-                       max_threads=8)
+                       max_threads=10)
   bot.run()

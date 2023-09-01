@@ -1,12 +1,14 @@
+import glob
 import logging
+import os
 import subprocess as sp
 from pathlib import Path
-import glob
+
 from StreamBot import setup_logger
 
 if __name__ == '__main__':
-  log_dir = './logs'
-  setup_logger(log_dir)
+  log_dir = os.path.join(os.path.dirname(__file__), 'logs')
+  setup_logger(__file__, log_dir, debug=True)
 
   logger = logging.getLogger(__file__)
   logger.setLevel(logging.DEBUG)

@@ -22,7 +22,8 @@ class IURLDownloadBot:
                dst_dir: str,
                max_queue: int = 5,
                max_threads: int = 3) -> None:
-    self.logger = logging.getLogger(__name__)
+    self.logger = logging.getLogger(__file__)
+    self.logger.setLevel(logging.DEBUG)
 
     self.__type = bot_type
     self.__prefix = f'{self.type.value}_bot_'

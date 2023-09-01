@@ -1,29 +1,58 @@
+import glob
 import logging
 import os
 import sys
 import traceback
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from .enums import FileSizeLevel
 
 
-def setup_logger(save_dir: str = './logs', debug: bool = False):
-  os.makedirs(save_dir, exist_ok=True)
-  formatter = logging.Formatter('%(asctime)s | %(levelname)s | %(message)s')
-  logger_name = os.path.basename(__file__)
-  log_time = datetime.now().strftime('%Y%m%d_%H%M%S')
-  log_file_name = f'{logger_name.split(".")[0]}_{log_time}.log'
-  log_file_path = os.path.join(save_dir, log_file_name)
+def clean_up_logs(save_dir: str, log_keep_days: int):
+  logs = glob.glob(os.path.join(save_dir, '*.log'), recursive=True)
+  for log in logs:
+    fn = os.path.basename(log)
+    date_str = fn.split('.')[0].split('_')[-2]
+    date = datetime.strptime(date_str, '%Y%m%d')
+    if date < datetime.today() - timedelta(days=log_keep_days):
+      os.remove(log)
 
-  file_hdl = logging.FileHandler(log_file_path)
-  file_hdl.setFormatter(formatter)
-  file_hdl.setLevel(logging.DEBUG)
+def setup_logger(logger_name: str,
+                 save_dir: str,
+                 log_keep_days: int = 7,
+                 ext_name: str = '',
+                 log_file: bool = True,
+                 debug: bool = False):
+  save_dir = os.path.abspath(save_dir)
+  os.makedirs(save_dir, exist_ok=True)
+  clean_up_logs(save_dir, log_keep_days)
+
+  formatter = logging.Formatter('%(asctime)s | %(levelname)s | %(message)s')
+  log_time = datetime.now().strftime('%Y%m%d_%H%M%S')
+  logger_name = os.path.basename(logger_name)
+
+  hdls = []
+  if log_file:
+    log_file_name = f'{logger_name.split(".")[0]}'
+    if ext_name is not None and ext_name != '':
+      log_file_name = f'{log_file_name}_{ext_name}'
+    log_file_name = f'{log_file_name}_{log_time}.log'
+    log_file_path = os.path.join(save_dir, log_file_name)
+
+    file_hdl = logging.FileHandler(log_file_path, encoding='utf-8')
+    file_hdl.setFormatter(formatter)
+    file_hdl.setLevel(logging.DEBUG)
+    hdls.append(file_hdl)
 
   stream_hdl = logging.StreamHandler(sys.stdout)
   stream_hdl.setFormatter(formatter)
-  stream_hdl.setLevel(logging.DEBUG if debug else logging.INFO)
+  log_level = logging.INFO
+  if debug:
+    log_level = logging.DEBUG
+  stream_hdl.setLevel(log_level)
+  hdls.append(stream_hdl)
 
-  logging.basicConfig(level=logging.DEBUG, handlers=[stream_hdl])
+  logging.basicConfig(handlers=hdls)
 
 
 def error_msg(err):

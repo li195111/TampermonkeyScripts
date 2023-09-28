@@ -1,6 +1,5 @@
 import logging
 import os
-
 from StreamBot import BotType, URLDownloadBot, setup_logger
 
 if __name__ == '__main__':

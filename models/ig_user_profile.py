@@ -1,8 +1,10 @@
-from typing import List, Any, Optional
 from enum import Enum
+from typing import Any, List, Optional, Union
 
 from pydantic.fields import Field
+
 from models.base import IBase
+
 
 class BioLink(IBase):
   title: str
@@ -13,12 +15,8 @@ class BioLink(IBase):
 class BiographyWithEntities(IBase):
   raw_text: str
   entities: List[Any]
-
-class Name(Enum):
-  JOANNE_722 = "joanne_722"
-
 class ClipsMusicAttributionInfo(IBase):
-  artist_name: Name
+  artist_name: str
   song_name: str
   uses_original_audio: bool
   should_mute_audio: bool
@@ -27,7 +25,7 @@ class ClipsMusicAttributionInfo(IBase):
 
 class DashInfo(IBase):
   is_dash_eligible: bool
-  video_dash_manifest: str
+  video_dash_manifest: Optional[str]
   number_of_qualities: int
 
 class Dimensions(IBase):
@@ -67,19 +65,14 @@ class EdgeMediaToTaggedUser(IBase):
 
 class Owner(IBase):
   id: int
-  username: Name
+  username: str
 
 class SharingFrictionInfo(IBase):
   should_have_sharing_friction: bool
   bloks_app_url: Optional[str]
 
-class FluffyTypename(Enum):
-  GRAPH_IMAGE = "GraphImage"
-  GRAPH_VIDEO = "GraphVideo"
-
-
 class StickyNode(IBase):
-  typename: FluffyTypename = Field(alias='__typename')
+  typename: str = Field(alias='__typename')
   id: str
   shortcode: str
   dimensions: Dimensions
@@ -90,7 +83,7 @@ class StickyNode(IBase):
   gating_info: Optional[str]
   sharing_friction_info: SharingFrictionInfo
   media_overlay_info: Optional[str]
-  media_preview: str
+  media_preview: Optional[str]
   owner: Owner
   is_video: bool
   has_upcoming_event: bool
@@ -123,13 +116,8 @@ class ThumbnailResource(IBase):
   config_width: int
   config_height: int
 
-class PurpleTypename(Enum):
-  GRAPH_SIDECAR = "GraphSidecar"
-  GRAPH_VIDEO = "GraphVideo"
-
-
 class PurpleNode(IBase):
-  typename: PurpleTypename = Field(alias='__typename')
+  typename: str = Field(alias='__typename')
   id: str
   shortcode: str
   dimensions: Dimensions
@@ -194,18 +182,22 @@ class EdgeMutualFollowedBy(IBase):
   count: int
   edges: List[EdgeMutualFollowedByEdge]
 
+class FBProfileBioLink(IBase):
+  url: str
+  name: str
+
 class DataUser(IBase):
   ai_agent_type: Optional[str]
   biography: str
   bio_links: List[BioLink]
-  fb_profile_biolink: Optional[str]
+  fb_profile_biolink: Optional[Union[str, FBProfileBioLink]]
   biography_with_entities: BiographyWithEntities
   blocked_by_viewer: bool
   restricted_by_viewer: bool
   country_block: bool
   eimu_id: str
-  external_url: str
-  external_url_linkshimmed: str
+  external_url: Optional[str]
+  external_url_linkshimmed: Optional[str]
   edge_followed_by: EdgeFollowClass
   fbid: str
   followed_by_viewer: bool
@@ -238,7 +230,7 @@ class DataUser(IBase):
   business_category_name: Optional[str]
   overall_category_name: Optional[str]
   category_enum: Optional[str]
-  category_name: str
+  category_name: Optional[str]
   is_private: bool
   is_verified: bool
   is_verified_by_mv4b: bool
@@ -253,7 +245,7 @@ class DataUser(IBase):
   show_account_transparency_details: bool
   transparency_label: Optional[str]
   transparency_product: str
-  username: Name
+  username: str
   connected_fb_page: Optional[str]
   pronouns: List[Any]
   edge_felix_video_timeline: EdgeFelixVideoTimelineClass

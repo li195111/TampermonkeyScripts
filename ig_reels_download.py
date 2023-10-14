@@ -1,14 +1,16 @@
 import json
 import logging
+from pathlib import Path
 import os
-
+from datetime import datetime
 import requests
+from urllib.parse import urlparse
 
 from models.ig_reels import InsReels
 from models.ig_reels_tray import ReelsTray
 from models.ig_user_profile import UserProfile
 from models.ig_username import InsUsername
-from StreamBot import setup_logger
+from StreamBot import setup_logger, MediaType
 
 if __name__ == '__main__':
   log_dir = os.path.join(os.path.dirname(__file__), 'logs')
@@ -37,13 +39,25 @@ if __name__ == '__main__':
   }
 
   user_name = 'joanne_722'
+  user_name = '__t.i.f.f.a.n.y__'
+  user_name = 'hsinyu_c__'
+  user_name = 'hsuan0711'
+  user_name = 'yueh_0720'
 
   # Get User Profile
   # parse data.user.id to get <user_id>
   user_profile_url = f'https://www.instagram.com/api/v1/users/web_profile_info/?username={user_name}'
   # parse tag <script type="application/json" data-content-len="154021" data-sjs> to get <user_id> lower case
   ig_user_url = f'https://www.instagram.com/{user_name}/'
-  temp_file = 'ig_profile_test.json'
+
+  timestamp = datetime.now().strftime('%Y%m%d')
+  prefix = f'ig_{user_name}_{timestamp}'
+  payload_history_dir = Path('history')
+  payload_history_dir.mkdir(parents=True,exist_ok=True)
+  save_path = Path('C:/Users/LIDESKTOP/Downloads/')
+  output_prefix = f'ig_bot_{user_name}_{timestamp}'
+
+  temp_file = payload_history_dir.joinpath(f'{prefix}_profile_test.json').as_posix()
   url = user_profile_url
   if not os.path.exists(temp_file):
     resp = requests.get(url, headers=headers)
@@ -61,7 +75,7 @@ if __name__ == '__main__':
 
   # Get Username Payload
   ig_username_payload_url = f'https://www.instagram.com/api/v1/feed/user/{user_name}/username/?count=12'
-  temp_file = 'ig_username_payload_test.json'
+  temp_file = payload_history_dir.joinpath(f'{prefix}_username_payload_test.json').as_posix()
   url = ig_username_payload_url
   if not os.path.exists(temp_file):
     resp = requests.get(url, headers=headers)
@@ -79,7 +93,7 @@ if __name__ == '__main__':
   # Get Reels Tray Payload
   # 取得 Reels 資料 get story id 
   ig_reels_tray_url = f'https://www.instagram.com/api/v1/feed/reels_tray/?is_following_feed=true'
-  temp_file = 'ig_reels_tray_payload_following_test.json'
+  temp_file = payload_history_dir.joinpath(f'{prefix}_reels_tray_payload_following_test.json').as_posix()
   url = ig_reels_tray_url
   if not os.path.exists(temp_file):
     resp = requests.get(url, headers=headers)
@@ -104,7 +118,7 @@ if __name__ == '__main__':
   if story_id is not None:
     ig_stories_url = f'https://www.instagram.com/stories/{user_name}/{story_id}/'
     ig_media_url = f'https://www.instagram.com/api/v1/feed/reels_media/?media_id={story_id}&reel_ids={user_id}'
-    temp_file = 'ig_media_payload.json'
+    temp_file = payload_history_dir.joinpath(f'{prefix}_media_payload.json').as_posix()
     url = ig_media_url
     if not os.path.exists(temp_file):
       resp = requests.get(url, headers=headers)
@@ -117,6 +131,16 @@ if __name__ == '__main__':
         payload = json.loads(fp.read())
     insta_reels = InsReels(**payload)
     for idx, item in enumerate(insta_reels.reels_media[0].items):
-      logger.info('%s Image: %s', idx, item.image_versions2.candidates[0].url)
+      img_url = item.image_versions2.candidates[0].url
+      img_name = urlparse(img_url).path.split('/')[-1]
+      img_file_name = f'{output_prefix}_{MediaType.IMG.value}_{img_name}.txt'
+      with open(save_path.joinpath(img_file_name).as_posix(), 'w', encoding='utf-8') as img_fp:
+        img_fp.write(img_url)
+      logger.info('%s Image: %s', idx, img_name)
       if item.video_versions is not None:
-        logger.info('%s Video: %s', idx, item.video_versions[0].url)
+        vid_url = item.video_versions[0].url
+        vid_name = urlparse(vid_url).path.split('/')[-1]
+        vid_file_name = f'{output_prefix}_{MediaType.VID.value}_{vid_name}.txt'
+        with open(save_path.joinpath(vid_file_name).as_posix(), 'w', encoding='utf-8') as vid_fp:
+          vid_fp.write(vid_url)
+        logger.info('%s Video: %s', idx, vid_name)

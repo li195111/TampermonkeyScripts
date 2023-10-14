@@ -80,7 +80,7 @@ class Tray(IBase):
   has_fan_club_media: bool
   show_fan_club_stories_teaser: bool
   disabled_reply_types: List[DisabledReplyType]
-  eligible_for_hype: bool
+  eligible_for_hype: Optional[bool]
 
 class ReelsTray(IBase):
   tray: List[Tray]

@@ -30,3 +30,4 @@ class ID(Enum):
 
 class VideoCodec(Enum):
   AVC1_64001_F = "avc1.64001f"
+  AVC1_64001_E = "avc1.64001e"

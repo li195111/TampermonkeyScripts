@@ -214,7 +214,7 @@ class Reel(IBase):
   media_ids: List[str]
   is_cacheable: bool
   disabled_reply_types: List[str]
-  eligible_for_hype: bool
+  eligible_for_hype: Optional[bool]
 
 class InsReels(IBase):
   reels: Dict[str, Reel]

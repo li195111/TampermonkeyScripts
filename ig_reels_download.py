@@ -43,6 +43,11 @@ if __name__ == '__main__':
   user_name = 'hsinyu_c__'
   user_name = 'hsuan0711'
   user_name = 'yueh_0720'
+  user_name = 'freyaachuang'
+  user_name = '95_mizuki'
+  user_name = '1105ya'
+  user_name = 'chuchu.5299'
+  user_name = 'wendy__624'
 
   # Get User Profile
   # parse data.user.id to get <user_id>

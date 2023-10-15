@@ -116,6 +116,12 @@ class ThumbnailResource(IBase):
   config_width: int
   config_height: int
 
+class FelixProfileGridCrop(IBase):
+  crop_left: float
+  crop_right: float
+  crop_top: float
+  crop_bottom: float
+
 class PurpleNode(IBase):
   typename: str = Field(alias='__typename')
   id: str
@@ -148,7 +154,7 @@ class PurpleNode(IBase):
   nft_asset_info: Optional[str]
   thumbnail_src: str
   thumbnail_resources: List[ThumbnailResource]
-  felix_profile_grid_crop: Optional[str]
+  felix_profile_grid_crop: Optional[Union[str, FelixProfileGridCrop]]
   coauthor_producers: List[Any]
   pinned_for_users: List[Any]
   viewer_can_reshare: bool

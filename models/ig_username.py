@@ -336,8 +336,8 @@ class Location(IBase):
   address: str
   city: str
   has_viewer_saved: bool
-  lng: float
-  lat: float
+  lng: Optional[float]
+  lat: Optional[float]
   is_eligible_for_guides: bool
 
 class MediaAppreciationSettings(IBase):
@@ -357,7 +357,7 @@ class MusicMetadata(IBase):
   music_canonical_id: int
   audio_type: Optional[str]
   music_info: Optional[Union[str, MusicInfo]]
-  original_sound_info: Optional[str]
+  original_sound_info: Optional[OriginalSoundInfo]
   pinned_media_ids: Optional[Union[str, List[str]]]
 
 class Item(IBase):
@@ -456,8 +456,8 @@ class Item(IBase):
 class InsUsername(IBase):
   items: List[Item]
   num_results: int
-  more_available: bool
-  next_max_id: str
-  user: UserElement
-  auto_load_more_enabled: bool
+  more_available: Optional[bool]
+  next_max_id: Optional[str]
+  user: Optional[UserElement]
+  auto_load_more_enabled: Optional[bool]
   status: str

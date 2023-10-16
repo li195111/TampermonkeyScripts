@@ -20,6 +20,7 @@ if __name__ == '__main__':
   
   headers_folder_path = Path('headers')
   bot_user_name = 'li195111'
+  bot_user_name = '__j__a.s'
   with open(headers_folder_path.joinpath(f'{bot_user_name}.json'), 'r', encoding='utf-8') as hfp:
     header_data = json.load(hfp)  
   headers = {
@@ -41,13 +42,16 @@ if __name__ == '__main__':
   user_name = 'joanne_722'
   user_name = '__t.i.f.f.a.n.y__'
   user_name = 'hsinyu_c__'
-  user_name = 'hsuan0711'
-  user_name = 'yueh_0720'
-  user_name = 'freyaachuang'
-  # user_name = '95_mizuki'
-  # user_name = '1105ya'
-  # user_name = 'chuchu.5299'
-  # user_name = 'wendy__624'
+  # user_name = 'hsuan0711'
+  # user_name = 'yueh_0720'
+  # user_name = 'freyaachuang'
+  # # user_name = '95_mizuki'
+  # # user_name = '1105ya'
+  # # user_name = 'chuchu.5299'
+  # # user_name = 'wendy__624'
+  user_name = 'yuchinjou'
+  user_name = 'superlisa821'
+  user_name = 'lovelynnboo'
 
   # Get User Profile
   # parse data.user.id to get <user_id>

@@ -8,3 +8,4 @@ node_modules/
 ConvertLogs/
 .vscode/
 ig_*.json
+headers/

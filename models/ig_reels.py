@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from pydantic.fields import Field
 
@@ -11,8 +11,8 @@ from models.enums import (ID, AppID, BloksStickerType, CommercialityStatus,
 class CommentInformTreatment(IBase):
   should_have_inform_treatment: bool
   text: str
-  url: None
-  action_type: None
+  url: Optional[str]
+  action_type: Optional[str]
 
 class Candidate(IBase):
   width: int
@@ -24,8 +24,8 @@ class ImageVersions2(IBase):
 
 class SharingFrictionInfo(IBase):
   should_have_sharing_friction: bool
-  bloks_app_url: None
-  sharing_friction_payload: None
+  bloks_app_url: Optional[str]
+  sharing_friction_payload: Optional[str]
 
 class IgMention(IBase):
   account_id: str
@@ -111,13 +111,13 @@ class Item(IBase):
   is_visual_reply_commenter_notice_enabled: bool
   commerciality_status: CommercialityStatus
   explore_hide_comments: bool
-  shop_routing_user_id: None
+  shop_routing_user_id: Optional[str]
   can_see_insights_as_brand: bool
   is_organic_product_tagging_eligible: bool
   likers: List[Any]
   media_type: int
   code: str
-  caption: None
+  caption: Optional[str]
   clips_tab_pinned_user_ids: List[Any]
   comment_inform_treatment: CommentInformTreatment
   sharing_friction_info: SharingFrictionInfo
@@ -133,7 +133,7 @@ class Item(IBase):
   original_height: int
   product_type: ProductType
   is_paid_partnership: bool
-  music_metadata: None
+  music_metadata: Optional[str]
   organic_tracking_token: str
   ig_media_sharing_disabled: bool
   crosspost: Optional[List[Crosspost]]
@@ -143,7 +143,7 @@ class Item(IBase):
   is_cutout_sticker_allowed: bool
   is_dash_eligible: Optional[int]
   video_dash_manifest: Optional[str]
-  video_codec: Optional[VideoCodec]
+  video_codec: Optional[Union[VideoCodec,str]]
   number_of_qualities: Optional[int]
   video_versions: Optional[List[VideoVersion]]
   has_audio: Optional[bool]
@@ -203,10 +203,10 @@ class Reel(IBase):
   can_reshare: bool
   can_react_with_avatar: bool
   reel_type: str
-  ad_expiry_timestamp_in_millis: None
-  is_cta_sticker_available: None
-  app_sticker_info: None
-  should_treat_link_sticker_as_cta: None
+  ad_expiry_timestamp_in_millis: Optional[str]
+  is_cta_sticker_available: Optional[str]
+  app_sticker_info: Optional[str]
+  should_treat_link_sticker_as_cta: Optional[str]
   user: The51054288_User
   items: List[Item]
   prefetch_count: int

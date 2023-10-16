@@ -17,18 +17,17 @@ if __name__ == '__main__':
   setup_logger(__file__, log_dir)
   logger = logging.getLogger(__file__)
   logger.setLevel(logging.DEBUG)
+  
+  headers_folder_path = Path('headers')
+  bot_user_name = 'li195111'
+  with open(headers_folder_path.joinpath(f'{bot_user_name}.json'), 'r', encoding='utf-8') as hfp:
+    header_data = json.load(hfp)  
   headers = {
     'Host':'www.instagram.com',
     'Accept':'*/*',
     'Accept-Language': 'zh-TW,zh;q=0.8,en-US;q=0.5,en;q=0.3',
     'Accept-Encoding': 'gzip, deflate, br',
     'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/118.0',
-    'Cookie':'csrftoken=ZrG4Ro5Zj0ANxxFHDxvppNuoRwfQ33TG; mid=ZGx-UAALAAGSkfJX_Cy6x_5-U6bW; ig_did=ADD2C94D-59D5-47ED-8096-D3F73EE265E0; ig_nrcb=1; datr=T35sZByHaOXF9DFvw59cmhFK; ds_user_id=38513711810; sessionid=38513711810%3AO1KzZZMVbRj2By%3A24%3AAYeNTAymjA_iVIeByL3c9e2_Hy-fkTksBO4TkYEyR8se; shbid="853\05438513711810\0541727163657:01f76cbd6ccf74cadf1bb30aa5914af44e8f21ece78890edffa9f861b7e9ff575aa10e82"; shbts="1695627657\05438513711810\0541727163657:01f797be338d12a2f482270c30cc7497994e26c17b8d7260490732838ae54a5168fc54f8"; rur="CCO\05438513711810\0541727398178:01f7ca032c3284110720a06d59f4f95e2ea85e1d7c2f18b659171fd17290acc6046febef"',
-    'X-CSRFToken':'ZrG4Ro5Zj0ANxxFHDxvppNuoRwfQ33TG',
-    'X-IG-App-ID':'936619743392459',
-    'X-ASBD-ID':'129477',
-    'X-IG-WWW-Claim':'hmac.AR0fc_YLexJMTnYtt-Fy-06eg0CJtO2eeIodEO1YwMhvh46S',
-    'X-Requested-With':'XMLHttpRequest',
     'DNT':'1',
     'Alt-Used': 'www.instagram.com',
     'Connection': 'keep-alive',
@@ -36,6 +35,7 @@ if __name__ == '__main__':
     'Sec-Fetch-Mode': 'cors',
     'Sec-Fetch-Site': 'same-origin',
     'TE':'trailers',
+    **header_data
   }
 
   user_name = 'joanne_722'
@@ -44,10 +44,10 @@ if __name__ == '__main__':
   user_name = 'hsuan0711'
   user_name = 'yueh_0720'
   user_name = 'freyaachuang'
-  user_name = '95_mizuki'
-  user_name = '1105ya'
-  user_name = 'chuchu.5299'
-  user_name = 'wendy__624'
+  # user_name = '95_mizuki'
+  # user_name = '1105ya'
+  # user_name = 'chuchu.5299'
+  # user_name = 'wendy__624'
 
   # Get User Profile
   # parse data.user.id to get <user_id>

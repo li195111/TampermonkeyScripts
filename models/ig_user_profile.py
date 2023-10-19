@@ -106,11 +106,6 @@ class Location(IBase):
   name: str
   slug: str
 
-class ProductType(Enum):
-  CLIPS = "clips"
-  FEED = "feed"
-  IGTV = "igtv"
-
 class ThumbnailResource(IBase):
   src: str
   config_width: int
@@ -160,7 +155,7 @@ class PurpleNode(IBase):
   viewer_can_reshare: bool
   encoding_status: Optional[str]
   is_published: Optional[bool]
-  product_type: Optional[ProductType]
+  product_type: Optional[str]
   title: Optional[str]
   video_duration: Optional[float]
   edge_sidecar_to_children: Optional[EdgeSidecarToChildren]

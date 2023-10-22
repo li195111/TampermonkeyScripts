@@ -70,7 +70,7 @@ class Caption(IBase):
   is_covered: bool
   private_reply_status: int
   media_id: str
-  has_translation: bool
+  has_translation: Optional[bool]
 
 class UserElement(IBase):
   pk: str
@@ -149,14 +149,29 @@ class AdditionalAudioInfo(IBase):
   audio_reattribution_info: AudioReattributionInfo
 
 class AudioRankingInfo(IBase):
-  best_audio_cluster_id: str
+  best_audio_cluster_id: Optional[str]
 
 class BrandedContentTagInfo(IBase):
   can_add_tag: bool
 
+
+class Comment(IBase):
+  action_type: str
+
+class Pill(IBase):
+  action_type: str
+  priority: int
+
+class EntryPointContainer(IBase):
+  pill: Pill
+  comment: Comment
+  overflow: Optional[str]
+  ufi: Optional[str]
+
+
 class ContentAppreciationInfo(IBase):
   enabled: bool
-  entry_point_container: Optional[str]
+  entry_point_container: Optional[Union[str, EntryPointContainer]]
 
 class ConsumptionInfo(IBase):
   is_bookmarked: bool
@@ -171,7 +186,7 @@ class OriginalSoundInfo(IBase):
   progressive_download_url: str
   duration_in_ms: int
   dash_manifest: str
-  ig_artist: UserElement
+  ig_artist: Optional[Union[str,UserElement]]
   should_mute_audio: bool
   hide_remixing: bool
   original_media_id: str
@@ -224,12 +239,12 @@ class MusicAssetInfo(IBase):
   sanitized_title: Optional[str]
   subtitle: str
   display_artist: str
-  artist_id: str
+  artist_id: Optional[str]
   cover_artwork_uri: str
   cover_artwork_thumbnail_uri: str
   progressive_download_url: str
   reactive_audio_download_url: Optional[str]
-  fast_start_progressive_download_url: str
+  fast_start_progressive_download_url: Optional[str]
   web_30_s_preview_download_url: Optional[str]
   highlight_start_times_in_ms: List[int]
   is_explicit: bool
@@ -249,7 +264,7 @@ class AudioMutingInfo(IBase):
   show_muted_audio_toast: bool
 
 class MusicConsumptionInfo(IBase):
-  ig_artist: Optional[str]
+  ig_artist: Optional[Union[str,UserElement]]
   placeholder_profile_pic_url: str
   should_mute_audio: bool
   should_mute_audio_reason: str
@@ -275,7 +290,7 @@ class MusicInfo(IBase):
 class ClipsMetadata(IBase):
   music_info: Optional[Union[str, MusicInfo]]
   original_sound_info: Optional[Union[str, OriginalSoundInfo]]
-  audio_type: str
+  audio_type: Optional[str]
   music_canonical_id: str
   featured_label: Optional[str]
   mashup_info: Dict[str, Optional[bool]]
@@ -372,8 +387,8 @@ class Location(IBase):
   address: str
   city: str
   has_viewer_saved: bool
-  lng: float
-  lat: float
+  lng: Optional[float]
+  lat: Optional[float]
   is_eligible_for_guides: bool
 
 class MediaAppreciationSettings(IBase):
@@ -387,7 +402,7 @@ class SquareCrop(IBase):
   crop_bottom: float
 
 class MediaCroppingInfo(IBase):
-  square_crop: SquareCrop
+  square_crop: Optional[SquareCrop]
 
 class MediaNotes(IBase):
   items: List[Any]
@@ -397,7 +412,7 @@ class MusicMetadata(IBase):
   audio_type: Optional[str]
   music_info: Optional[Union[str, MusicInfo]]
   original_sound_info: Optional[Union[str,OriginalSoundInfo]]
-  pinned_media_ids: Optional[str]
+  pinned_media_ids: Optional[Union[str,List[str]]]
 
 class Item(IBase):
   taken_at: int
@@ -431,7 +446,7 @@ class Item(IBase):
   media_type: int
   code: str
   can_viewer_reshare: bool
-  caption: Caption
+  caption: Optional[Caption]
   clips_tab_pinned_user_ids: List[Any]
   comment_inform_treatment: CommentInformTreatment
   sharing_friction_info: SharingFrictionInfo
@@ -463,14 +478,14 @@ class Item(IBase):
   comment_likes_enabled: Optional[bool]
   comment_threading_enabled: bool
   max_num_visible_preview_comments: int
-  has_more_comments: bool
+  has_more_comments: Optional[bool]
   next_max_id: Optional[str]
-  preview_comments: List[Comment]
-  comments: List[Comment]
+  preview_comments: Optional[List[Comment]]
+  comments: Optional[List[Comment]]
   comment_count: int
-  can_view_more_preview_comments: bool
-  hide_view_all_comment_entrypoint: bool
-  inline_composer_display_condition: str
+  can_view_more_preview_comments: Optional[bool]
+  hide_view_all_comment_entrypoint: Optional[bool]
+  inline_composer_display_condition: Optional[str]
   has_delayed_metadata: bool
   is_auto_created: bool
   is_quiet_post: bool

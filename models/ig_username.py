@@ -142,9 +142,23 @@ class AudioRankingInfo(IBase):
 
 class BrandedContentTagInfo(IBase):
   can_add_tag: bool
+
+class Comment(IBase):
+  action_type: str
+
+class Pill(IBase):
+  action_type: str
+  priority: int
+
+class EntryPointContainer(IBase):
+  pill: Pill
+  comment: Comment
+  overflow: Optional[str]
+  ufi: Optional[str]
+
 class ContentAppreciationInfo(IBase):
   enabled: bool
-  entry_point_container: Optional[str]
+  entry_point_container: Optional[Union[str, EntryPointContainer]]
 
 class ConsumptionInfo(IBase):
   is_bookmarked: bool
@@ -446,14 +460,14 @@ class Item(IBase):
   comment_likes_enabled: Optional[bool]
   comment_threading_enabled: bool
   max_num_visible_preview_comments: int
-  has_more_comments: bool
+  has_more_comments: Optional[bool]
   next_max_id: Optional[str]
-  preview_comments: List[Comment]
-  comments: List[Comment]
+  preview_comments: Optional[List[Comment]]
+  comments: Optional[List[Comment]]
   comment_count: int
-  can_view_more_preview_comments: bool
-  hide_view_all_comment_entrypoint: bool
-  inline_composer_display_condition: str
+  can_view_more_preview_comments: Optional[bool]
+  hide_view_all_comment_entrypoint: Optional[bool]
+  inline_composer_display_condition: Optional[str]
   has_delayed_metadata: bool
   is_auto_created: bool
   is_quiet_post: bool

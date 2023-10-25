@@ -4,11 +4,15 @@ from pydantic.fields import Field
 
 from models.base import IBase
 
+class FanConsiderationPageRevampEligiblity(IBase):
+  should_show_social_context: bool
+  should_show_content_preview: bool
+
 class FanClubInfo(IBase):
   fan_club_id: Optional[str]
   fan_club_name: Optional[str]
   is_fan_club_referral_eligible: Optional[str]
-  fan_consideration_page_revamp_eligiblity: Optional[str]
+  fan_consideration_page_revamp_eligiblity: Optional[Union[str,FanConsiderationPageRevampEligiblity]]
   is_fan_club_gifting_eligible: Optional[str]
   subscriber_count: Optional[str]
   connected_member_count: Optional[str]

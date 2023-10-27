@@ -89,6 +89,7 @@ if __name__ == '__main__':
       payload = resp.json()
       fp.write(json.dumps(payload,indent=2))
   else:
+    logger.info(f'Parse Exists: {Path(temp_file).name}')
     with open(temp_file, 'r', encoding='utf-8') as fp:
       payload = json.loads(fp.read())
   userprofile = UserProfile(**payload)
@@ -107,6 +108,7 @@ if __name__ == '__main__':
       payload = resp.json()
       fp.write(json.dumps(payload,indent=2))
   else:
+    logger.info(f'Parse Exists: {Path(temp_file).name}')
     with open(temp_file, 'r', encoding='utf-8') as fp:
       payload = json.loads(fp.read())
   ins_username = InsUsername(**payload)
@@ -188,13 +190,14 @@ if __name__ == '__main__':
   ig_feed_user_url = f'https://www.instagram.com/api/v1/feed/user/{user_id}/?count=12'
   temp_file = payload_history_dir.joinpath(f'{prefix}_feed_user_payload.json').as_posix()
   url = ig_feed_user_url
-  if not os.path.exists(temp_file):
+  if not Path(temp_file).exists():
     resp = requests.get(url, headers=headers)
     logger.info('Parse State: %s', resp.status_code)
     with open(temp_file, 'w', encoding='utf-8') as fp:
       payload = resp.json()
       fp.write(json.dumps(payload,indent=2))
   else:
+    logger.info(f'Parse Exists: {Path(temp_file).name}')
     with open(temp_file, 'r', encoding='utf-8') as fp:
       payload = json.loads(fp.read())
   feed_user = FeedUser(**payload)

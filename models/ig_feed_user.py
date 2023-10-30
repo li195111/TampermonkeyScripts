@@ -292,13 +292,27 @@ class MusicInfo(IBase):
   music_consumption_info: MusicConsumptionInfo
   music_canonical_id: Optional[str]
 
+class MashupInfo(IBase):
+  mashups_allowed: Optional[bool]
+  can_toggle_mashups_allowed: Optional[bool]
+  has_been_mashed_up: Optional[bool]
+  is_light_weight_check: Optional[bool]
+  formatted_mashups_count: Optional[str]
+  original_media: Optional[str]
+  privacy_filtered_mashups_media_count: Optional[str]
+  non_privacy_filtered_mashups_media_count: Optional[int]
+  mashup_type: Optional[str]
+  is_creator_requesting_mashup: Optional[bool]
+  has_nonmimicable_additional_audio: Optional[bool]
+  is_pivot_page_available: Optional[bool]
+
 class ClipsMetadata(IBase):
   music_info: Optional[Union[str, MusicInfo]]
   original_sound_info: Optional[Union[str, OriginalSoundInfo]]
   audio_type: Optional[str]
   music_canonical_id: str
   featured_label: Optional[str]
-  mashup_info: Dict[str, Optional[bool]]
+  mashup_info: Optional[Union[MashupInfo,str]]
   reusable_text_info: Optional[Union[str, List[ReusableTextInfo]]]
   reusable_text_attribute_string: Optional[str]
   nux_info: Optional[str]
@@ -519,8 +533,8 @@ class Item(IBase):
 class FeedUser(IBase):
   items: List[Item]
   num_results: int
-  more_available: bool
-  next_max_id: str
-  user: UserElement
-  auto_load_more_enabled: bool
+  more_available: Optional[bool]
+  next_max_id: Optional[str]
+  user: Optional[UserElement]
+  auto_load_more_enabled: Optional[bool]
   status: str

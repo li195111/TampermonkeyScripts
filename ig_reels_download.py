@@ -141,6 +141,7 @@ if __name__ == '__main__':
   user_names = [
       'joanne_722',
       'rosso.tw',
+      'we_love_mius',
       'fang_cen0130',
       'estherx118',
       'gg_851214',
@@ -150,7 +151,7 @@ if __name__ == '__main__':
       'hsinyu_c__',
       'hsuan0711',
       'yueh_0720',
-      'freyaachuang',
+      # 'freyaachuang',
       '95_mizuki',
       '1105ya',
       'chuchu.5299',
@@ -170,6 +171,7 @@ if __name__ == '__main__':
       't40533',
       'vivihsu0317',
       'pyoapple',
+      'pinpinponpon627',
   ]
 
   headers = get_headers(bot_user_name)

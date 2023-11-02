@@ -281,7 +281,7 @@ class MusicConsumptionInfo(IBase):
   is_trending_in_clips: bool
   trend_rank: Optional[str]
   formatted_clips_media_count: Optional[str]
-  display_labels: Optional[str]
+  display_labels: Optional[Union[List[str],str]]
   should_allow_music_editing: bool
   derived_content_id: Optional[str]
   audio_filter_infos: List[Any]

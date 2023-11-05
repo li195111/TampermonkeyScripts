@@ -103,7 +103,7 @@ class Item(IBase):
   is_reshare_of_text_post_app_media_in_ig: bool
   is_post_live_clips_media: bool
   deleted_reason: int
-  integrity_review_decision: IntegrityReviewDecision
+  integrity_review_decision: str
   has_shared_to_fb: int
   expiring_at: int
   is_unified_video: bool

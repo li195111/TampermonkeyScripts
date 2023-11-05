@@ -28,7 +28,7 @@ def parse_reels(user_name: str, headers):
 
   timestamp = datetime.now().strftime('%Y%m%dT%H')
   prefix = f'ig_{user_name}_{timestamp}'
-  payload_history_dir = Path('history')
+  payload_history_dir = Path('./history')
   payload_history_dir.mkdir(parents=True, exist_ok=True)
   save_path = Path('C:/Users/LIDESKTOP/Downloads/')
   output_prefix = f'ig_bot_{user_name}_{timestamp}'
@@ -78,9 +78,17 @@ def parse_reels(user_name: str, headers):
   if not os.path.exists(temp_file):
     resp = requests.get(url, headers=headers)
     logger.info('Parse State: %s', resp.status_code)
+    rm_file = False
     with open(temp_file, 'w', encoding='utf-8') as fp:
-      payload = resp.json()
+      try:
+        payload = resp.json()
+      except Exception as err:
+        logger.warning('Parse Failed, Please Check Headers')
+        rm_file = True
       fp.write(json.dumps(payload,indent=2))
+    if rm_file:
+      os.remove(temp_file)
+      exit()
   else:
     with open(temp_file, 'r', encoding='utf-8') as fp:
       payload = json.loads(fp.read())
@@ -142,44 +150,44 @@ def parse_reels(user_name: str, headers):
     # print(payload)
 
 
-  # # 限時動態
-  # ig_feed_user_url = f'https://www.instagram.com/api/v1/feed/user/{user_id}/?count=12'
-  # temp_file = payload_history_dir.joinpath(
-  #     f'{prefix}_feed_user_payload.json').as_posix()
-  # url = ig_feed_user_url
-  # if not Path(temp_file).exists():
-  #   resp = requests.get(url, headers=headers)
-  #   logger.info('Parse State: %s', resp.status_code)
-  #   with open(temp_file, 'w', encoding='utf-8') as fp:
-  #     payload = resp.json()
-  #     fp.write(json.dumps(payload, indent=2))
-  # else:
-  #   logger.warning(f'Parse Exists: {Path(temp_file).name}')
-  #   with open(temp_file, 'r', encoding='utf-8') as fp:
-  #     payload = json.loads(fp.read())
-  # feed_user = FeedUser(**payload)
-  # if feed_user.user is None:
-  #   logger.warning(f'No Avaliable User Found: {user_name}')
-  #   return
-  # for idx, feed in enumerate(feed_user.items):
-  #   img_url = feed.image_versions2.candidates[0].url
-  #   img_name = urlparse(img_url).path.split('/')[-1]
-  #   img_file_name = f'{output_prefix}_{MediaType.IMG.value}_{img_name}.txt'
-  #   with open(save_path.joinpath(img_file_name).as_posix(),
-  #             'w',
-  #             encoding='utf-8') as img_fp:
-  #     img_fp.write(img_url)
-  #   logger.info('%s Image: %s', idx, img_name)
-  #   if feed.video_versions is not None:
-  #     logger.info(feed)
-  #     vid_url = feed.video_versions[0].url
-  #     vid_name = urlparse(vid_url).path.split('/')[-1]
-  #     vid_file_name = f'{output_prefix}_{MediaType.VID.value}_{vid_name}.txt'
-  #     with open(save_path.joinpath(vid_file_name).as_posix(),
-  #               'w',
-  #               encoding='utf-8') as vid_fp:
-  #       vid_fp.write(vid_url)
-  #     logger.info('%s Video: %s', idx, vid_name)
+  # 限時動態
+  ig_feed_user_url = f'https://www.instagram.com/api/v1/feed/user/{user_id}/?count=12'
+  temp_file = payload_history_dir.joinpath(
+      f'{prefix}_feed_user_payload.json').as_posix()
+  url = ig_feed_user_url
+  if not Path(temp_file).exists():
+    resp = requests.get(url, headers=headers)
+    logger.info('Parse State: %s', resp.status_code)
+    with open(temp_file, 'w', encoding='utf-8') as fp:
+      payload = resp.json()
+      fp.write(json.dumps(payload, indent=2))
+  else:
+    logger.warning(f'Parse Exists: {Path(temp_file).name}')
+    with open(temp_file, 'r', encoding='utf-8') as fp:
+      payload = json.loads(fp.read())
+  feed_user = FeedUser(**payload)
+  if feed_user.user is None:
+    logger.warning(f'No Avaliable User Found: {user_name}')
+    return
+  for idx, feed in enumerate(feed_user.items):
+    img_url = feed.image_versions2.candidates[0].url
+    img_name = urlparse(img_url).path.split('/')[-1]
+    img_file_name = f'{output_prefix}_{MediaType.IMG.value}_{img_name}.txt'
+    with open(save_path.joinpath(img_file_name).as_posix(),
+              'w',
+              encoding='utf-8') as img_fp:
+      img_fp.write(img_url)
+    logger.info('%s Image: %s', idx, img_name)
+    if feed.video_versions is not None:
+      logger.info(feed)
+      vid_url = feed.video_versions[0].url
+      vid_name = urlparse(vid_url).path.split('/')[-1]
+      vid_file_name = f'{output_prefix}_{MediaType.VID.value}_{vid_name}.txt'
+      with open(save_path.joinpath(vid_file_name).as_posix(),
+                'w',
+                encoding='utf-8') as vid_fp:
+        vid_fp.write(vid_url)
+      logger.info('%s Video: %s', idx, vid_name)
 
 
 def get_headers(user_name: str):

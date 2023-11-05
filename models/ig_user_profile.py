@@ -194,7 +194,7 @@ class DataUser(IBase):
   fb_profile_biolink: Optional[Union[str, FBProfileBioLink]]
   biography_with_entities: BiographyWithEntities
   blocked_by_viewer: bool
-  restricted_by_viewer: bool
+  restricted_by_viewer: Optional[bool]
   country_block: bool
   eimu_id: str
   external_url: Optional[str]

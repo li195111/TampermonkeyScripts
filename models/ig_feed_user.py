@@ -483,7 +483,7 @@ class Item(IBase):
   image_versions2: ItemImageVersions2
   original_width: int
   original_height: int
-  media_notes: MediaNotes
+  media_notes: Optional[MediaNotes]
   product_type: Optional[str]
   is_paid_partnership: bool
   music_metadata: Optional[MusicMetadata]

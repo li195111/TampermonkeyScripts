@@ -44,7 +44,7 @@ class User(IBase):
   strong_id: str = Field(alias='strong_id__')
   username: str
   is_verified: bool
-  profile_pic_id: str
+  profile_pic_id: Optional[str]
   profile_pic_url: str
   birthday_today_visibility_for_viewer: BirthdayTodayVisibilityForViewer
   friendship_status: FriendshipStatus

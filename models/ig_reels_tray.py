@@ -83,10 +83,10 @@ class Tray(IBase):
   eligible_for_hype: Optional[bool]
 
 class ReelsTray(IBase):
-  tray: List[Tray]
-  story_ranking_token: UUID
-  story_likes_config: StoryLikesConfig
-  quick_snaps: None
+  tray: Optional[List[Tray]]
+  story_ranking_token: Optional[UUID]
+  story_likes_config: Optional[StoryLikesConfig]
+  quick_snaps: Optional[str]
   broadcasts: List[Any]
   sticker_version: int
   face_filter_nux_version: int

@@ -298,7 +298,7 @@ class MashupInfo(IBase):
   has_been_mashed_up: Optional[bool]
   is_light_weight_check: Optional[bool]
   formatted_mashups_count: Optional[str]
-  original_media: Optional[str]
+  original_media: Optional[Union[str,dict]]
   privacy_filtered_mashups_media_count: Optional[str]
   non_privacy_filtered_mashups_media_count: Optional[int]
   mashup_type: Optional[str]

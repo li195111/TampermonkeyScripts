@@ -230,7 +230,7 @@ class URLDownloadBot(IURLDownloadBot):
 
         ct = datetime.now()
         running_secs = (ct - st).seconds
-        if running_secs > 0 and running_secs % 30 == 0:
+        if running_secs > 0 and running_secs % 5 == 0:
           # Update Threads Log
           info_str = f'\33[KThreads: {self.thread_size}, Queues: {self.queue_size}'
           self.queue_infos(info_str)

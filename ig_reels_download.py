@@ -71,9 +71,10 @@ def parse_reels(user_name: str, headers):
   #   logger.info('User Location: %s', item.location)
 
   # Get Reels Tray Payload
-  # 取得 Reels 資料 get story id 
+  # 取得 Reels 資料 get story id
   ig_reels_tray_url = f'https://www.instagram.com/api/v1/feed/reels_tray/?is_following_feed=true'
-  temp_file = payload_history_dir.joinpath(f'{prefix}_reels_tray_payload_following_test.json').as_posix()
+  temp_file = payload_history_dir.joinpath(
+      f'{prefix}_reels_tray_payload_following_test.json').as_posix()
   url = ig_reels_tray_url
   if not os.path.exists(temp_file):
     resp = requests.get(url, headers=headers)
@@ -85,7 +86,7 @@ def parse_reels(user_name: str, headers):
       except Exception as err:
         logger.warning('Parse Failed, Please Check Headers')
         rm_file = True
-      fp.write(json.dumps(payload,indent=2))
+      fp.write(json.dumps(payload, indent=2))
     if rm_file:
       os.remove(temp_file)
       exit()
@@ -106,14 +107,15 @@ def parse_reels(user_name: str, headers):
   if story_id is not None:
     ig_stories_url = f'https://www.instagram.com/stories/{user_name}/{story_id}/'
     ig_media_url = f'https://www.instagram.com/api/v1/feed/reels_media/?media_id={story_id}&reel_ids={user_id}'
-    temp_file = payload_history_dir.joinpath(f'{prefix}_media_payload.json').as_posix()
+    temp_file = payload_history_dir.joinpath(
+        f'{prefix}_media_payload.json').as_posix()
     url = ig_media_url
     if not os.path.exists(temp_file):
       resp = requests.get(url, headers=headers)
       logger.info('Parse State: %s', resp.status_code)
       with open(temp_file, 'w', encoding='utf-8') as fp:
         payload = resp.json()
-        fp.write(json.dumps(payload,indent=2))
+        fp.write(json.dumps(payload, indent=2))
     else:
       with open(temp_file, 'r', encoding='utf-8') as fp:
         payload = json.loads(fp.read())
@@ -122,14 +124,18 @@ def parse_reels(user_name: str, headers):
       img_url = item.image_versions2.candidates[0].url
       img_name = urlparse(img_url).path.split('/')[-1]
       img_file_name = f'{output_prefix}_{MediaType.IMG.value}_{img_name}.txt'
-      with open(save_path.joinpath(img_file_name).as_posix(), 'w', encoding='utf-8') as img_fp:
+      with open(save_path.joinpath(img_file_name).as_posix(),
+                'w',
+                encoding='utf-8') as img_fp:
         img_fp.write(img_url)
       logger.info('%s Image: %s', idx, img_name)
       if item.video_versions is not None:
         vid_url = item.video_versions[0].url
         vid_name = urlparse(vid_url).path.split('/')[-1]
         vid_file_name = f'{output_prefix}_{MediaType.VID.value}_{vid_name}.txt'
-        with open(save_path.joinpath(vid_file_name).as_posix(), 'w', encoding='utf-8') as vid_fp:
+        with open(save_path.joinpath(vid_file_name).as_posix(),
+                  'w',
+                  encoding='utf-8') as vid_fp:
           vid_fp.write(vid_url)
         logger.info('%s Video: %s', idx, vid_name)
   else:
@@ -148,7 +154,6 @@ def parse_reels(user_name: str, headers):
     #   with open(temp_file, 'r', encoding='utf-8') as fp:
     #     payload = json.loads(fp.read())
     # print(payload)
-
 
   # 限時動態
   ig_feed_user_url = f'https://www.instagram.com/api/v1/feed/user/{user_id}/?count=12'
@@ -173,20 +178,19 @@ def parse_reels(user_name: str, headers):
     img_url = feed.image_versions2.candidates[0].url
     img_name = urlparse(img_url).path.split('/')[-1]
     img_file_name = f'{output_prefix}_{MediaType.IMG.value}_{img_name}.txt'
-    with open(save_path.joinpath(img_file_name).as_posix(),
-              'w',
-              encoding='utf-8') as img_fp:
-      img_fp.write(img_url)
+    img_file = save_path.joinpath(img_file_name)
+    if not img_file.exists():
+      with open(img_file.as_posix(), 'w', encoding='utf-8') as img_fp:
+        img_fp.write(img_url)
     logger.info('%s Image: %s', idx, img_name)
     if feed.video_versions is not None:
-      logger.info(feed)
       vid_url = feed.video_versions[0].url
       vid_name = urlparse(vid_url).path.split('/')[-1]
       vid_file_name = f'{output_prefix}_{MediaType.VID.value}_{vid_name}.txt'
-      with open(save_path.joinpath(vid_file_name).as_posix(),
-                'w',
-                encoding='utf-8') as vid_fp:
-        vid_fp.write(vid_url)
+      vid_file = save_path.joinpath(vid_file_name)
+      if not vid_file.exists():
+        with open(vid_file.as_posix(), 'w', encoding='utf-8') as vid_fp:
+          vid_fp.write(vid_url)
       logger.info('%s Video: %s', idx, vid_name)
 
 
@@ -256,9 +260,10 @@ if __name__ == '__main__':
       'vivihsu0317',
       'pyoapple',
       'pinpinponpon627',
+      'cawaiiun',
   ]
 
   headers = get_headers(bot_user_name)
   for user_ in user_names:
     parse_reels(user_name=user_, headers=headers)
-    time.sleep(random.random())
+    time.sleep(random.random() + random.random())

@@ -50,13 +50,13 @@ class CaptionUser(IBase):
   has_anonymous_profile_picture: bool
   hd_profile_pic_url_info: HDProfilePicURLInfo
   hd_profile_pic_versions: List[HDProfilePicURLInfo]
-  is_favorite: bool
+  is_favorite: Optional[bool]
   is_verified: bool
   profile_pic_id: Optional[str]
   profile_pic_url: str
   transparency_product_enabled: bool
   username: str
-  latest_reel_media: int
+  latest_reel_media: Optional[int]
 
 class Caption(IBase):
   pk: str
@@ -73,7 +73,7 @@ class Caption(IBase):
   share_enabled: bool
   is_ranked_comment: bool
   is_covered: bool
-  private_reply_status: int
+  private_reply_status: Optional[int]
   media_id: str
   has_translation: Optional[bool]
 
@@ -129,7 +129,7 @@ class CarouselMedia(IBase):
   taken_at: int
   preview: Optional[str]
   usertags: Optional[Tags]
-  featured_products: List[Any]
+  featured_products: Optional[List[Any]]
   fb_user_tags: Tags
   shop_routing_user_id: Optional[str]
   sharing_friction_info: SharingFrictionInfo
@@ -362,7 +362,7 @@ class Comment(IBase):
   share_enabled: bool
   is_ranked_comment: bool
   is_covered: bool
-  private_reply_status: int
+  private_reply_status: Optional[int]
   media_id: str
   has_translation: Optional[bool]
   has_liked_comment: bool
@@ -460,8 +460,8 @@ class Item(IBase):
   is_organic_product_tagging_eligible: bool
   has_liked: bool
   like_count: int
-  facepile_top_likers: List[UserElement]
-  top_likers: List[str]
+  facepile_top_likers: Optional[List[UserElement]]
+  top_likers: Optional[List[str]]
   media_type: int
   code: str
   can_viewer_reshare: bool
@@ -476,7 +476,7 @@ class Item(IBase):
   can_viewer_save: bool
   is_in_profile_grid: bool
   profile_grid_control_enabled: bool
-  featured_products: List[Any]
+  featured_products: Optional[List[Any]]
   is_comments_gif_composer_enabled: bool
   product_suggestions: List[Any]
   user: CaptionUser

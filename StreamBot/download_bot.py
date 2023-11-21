@@ -210,6 +210,14 @@ class URLDownloadBot(IURLDownloadBot):
           os.rename(file_path, dst_path)
         except FileNotFoundError:
           os.remove(file_path)
+    elif os.path.exists(item.file_path):
+      self.log(f'Clean Queue File include Queue')
+      # Clean All Queue File include Queue
+      file_path = item.file_path
+      # remove '.download' suffix
+      if item.file_path.endswith('.download'):
+        file_path = '.'.join(file_path.split('.')[:-1])
+      os.remove(item.file_path)
 
   def run(self):
     self.log('Start Downloader')
@@ -300,14 +308,14 @@ class URLDownloadBot(IURLDownloadBot):
       self.log(f'Stop Threads & Queues')
       self.log(f'Threads: {self.thread_size}, Queues: {self.queue_size}')
 
-      self.log(f'Clearn All Queue File exclude Queue')
-      # Clearn All Queue File exclude Queue
-      for media_type in MediaType:
-        for queue_file in self.search_queue_files(media_type):
-          if os.path.exists(queue_file):
-            # remove '.download' suffix
-            file_path = '.'.join(queue_file.split('.')[:-1])
-            if os.path.exists(file_path):
-              os.remove(file_path)
-            os.rename(queue_file, file_path)
+      # self.log(f'Clearn All Queue File exclude Queue')
+      # # Clearn All Queue File exclude Queue
+      # for media_type in MediaType:
+      #   for queue_file in self.search_queue_files(media_type):
+      #     if os.path.exists(queue_file):
+      #       # remove '.download' suffix
+      #       file_path = '.'.join(queue_file.split('.')[:-1])
+      #       if os.path.exists(file_path):
+      #         os.remove(file_path)
+      #       os.rename(queue_file, file_path)
     self.log('Finished Program')

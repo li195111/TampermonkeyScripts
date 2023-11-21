@@ -129,7 +129,7 @@ def parse_reels(user_name: str, headers):
                 encoding='utf-8') as img_fp:
         img_fp.write(img_url)
       logger.info('%s Image: %s', idx, img_name)
-      if item.video_versions is not None:
+      if item.video_versions is not None and len(item.video_versions) > 0:
         vid_url = item.video_versions[0].url
         vid_name = urlparse(vid_url).path.split('/')[-1]
         vid_file_name = f'{output_prefix}_{MediaType.VID.value}_{vid_name}.txt'
@@ -261,6 +261,7 @@ if __name__ == '__main__':
       'pyoapple',
       'pinpinponpon627',
       'cawaiiun',
+      'sincere_1109',
   ]
 
   headers = get_headers(bot_user_name)

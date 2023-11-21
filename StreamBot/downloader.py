@@ -126,7 +126,7 @@ class Stream(IStream):
           self.interrupt()
           self.save()
         except Exception as err:
-          self.logger.warning(f"Failed: {err.args[0]}")
+          self.logger.warning(f"Failed: {self.url.dir_name} {err.args[0]}")
           error = Error(message={"result": error_msg(err)})
           self.logger.warning(error)
           self.failed()

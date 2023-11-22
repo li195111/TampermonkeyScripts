@@ -267,4 +267,4 @@ if __name__ == '__main__':
   headers = get_headers(bot_user_name)
   for user_ in user_names:
     parse_reels(user_name=user_, headers=headers)
-    time.sleep(random.random() + random.random())
+    time.sleep(random.random() + random.random() + 0.5)

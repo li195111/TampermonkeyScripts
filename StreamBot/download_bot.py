@@ -37,7 +37,7 @@ class IURLDownloadBot:
 
     self.progress_length = 80
     self.downloader = StreamDownloader(timeout=0.5,
-                                       chunk_size=int(1024 * 1024 * 0.5),
+                                       chunk_size=int(1024 * 1024 * 1),
                                        progress_length=self.progress_length,
                                        max_connect=3)
     self.file_manager_cols = list(QueueItem.__fields__.keys())
@@ -80,6 +80,8 @@ class IURLDownloadBot:
       for t in item.threads:
         if t.status_string:
           state_str += f'{t.status_string}\n'
+        else:
+          state_str += f'No Status String\n'
     state_str += '\33[K'
     self.flush_counts = state_str.count('\n')
     if self.max_flush_counts < self.flush_counts or self.flush_counts == 1:
@@ -187,10 +189,12 @@ class URLDownloadBot(IURLDownloadBot):
         if self.thread_size < self.max_threads:
           item.state = FileState.DOWNLOAD
           self.log(f'{url.dir_name[:15]}')
+
           if self.type == BotType.EYNY:
             media = self.download_stream(url, True)
           elif self.type == BotType.IG:
             media = self.download(url)
+
           if media.pass_exists:
             self.log(f'Already Exists: {url.dir_name[:15]}')
           else:
@@ -269,7 +273,7 @@ class URLDownloadBot(IURLDownloadBot):
       self.warn('Error')
       error = Error(message={"result": error_msg(err)})
       self.warn(error)
-      self.log(f'Current Item: {current_item}')
+      # self.log(f'Current Item: {current_item}')
       for item in self.queue:
         for t in item.threads:
           t.is_failed = True
@@ -278,7 +282,7 @@ class URLDownloadBot(IURLDownloadBot):
     except KeyboardInterrupt:
       print(end='\n\33[K\33[F')
       self.warn('Shutdown Program')
-      self.log(f'Current Item: {current_item}')
+      # self.log(f'Current Item: {current_item}')
       for item in self.queue:
         for t in item.threads:
           t.is_interrupt = True

@@ -1,7 +1,9 @@
+import json
 import logging
 import os
 import time
 from datetime import datetime, timedelta
+from pathlib import Path
 from typing import Optional, Union
 from urllib.request import urlretrieve
 
@@ -30,15 +32,38 @@ class Stream(IStream):
     self.start_time: Union[datetime, None] = None
     self.status_string = ''
 
+  def get_headers(self, user_name: str):
+    proj_dir = Path(__file__).parent.parent
+    headers_folder_path = proj_dir.joinpath('headers')
+    with open(headers_folder_path.joinpath(f'{user_name}.json'),
+              'r',
+              encoding='utf-8') as hfp:
+      header_data = json.load(hfp)
+    headers = {
+        'Host': 'video.eyny.com',
+        'Accept': '*/*',
+        'Accept-Language': 'zh-TW,zh;q=0.8,en-US;q=0.5,en;q=0.3',
+        'Accept-Encoding': 'gzip, deflate',
+        'User-Agent':
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0',
+        'DNT': '1',
+        'Alt-Used': 'video.eyny.com',
+        'Connection': 'keep-alive',
+        **header_data
+    }
+    return headers
+
   def connect(self, url: str, timeout: Optional[float] = None):
     if self.start_time is None:
       self.start_time = datetime.now()
     start_time_str = self.start_time.strftime('%m/%d %H:%M:%S')
-    header = {
+
+    header = {}# self.get_headers('as852852sa')
+    header.update({
         'Referer': url,
         'Range': f'bytes={self.size}-',
-    }
-    header.update(self.base_header)
+    })
+
     with requests.get(
         url,
         stream=True,
@@ -47,6 +72,12 @@ class Stream(IStream):
 
       content_length = resp.headers.get('Content-Length', 0)
       self.total_size = self.size + int(content_length)
+      if self.total_size == 0:
+        print(f'No Size Received')
+        return 
+      if content_length == 0:
+        print('No Content Received')
+        return 
       resp.raise_for_status()
       for received_data_chunk in resp.iter_content(self.chunk_size):
         if self.is_interrupt:
@@ -170,12 +201,12 @@ class StreamDownloader:
     self.is_interrupt = False
 
   def download_stream_file(self, url: URL, load_cache: bool = True):
-    media = Stream(url, 3, self.chunk_size, self.progress_length, self.timeout,
+    self.media = Stream(url, 3, self.chunk_size, self.progress_length, self.timeout,
                    load_cache)
-    media.start()
-    return media
+    self.media.start()
+    return self.media
 
   def download_retrieve(self, url: URL):
-    media = Media(url)
-    media.start()
-    return media
+    self.media = Media(url)
+    self.media.start()
+    return self.media

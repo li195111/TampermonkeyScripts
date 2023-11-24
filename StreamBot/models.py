@@ -235,12 +235,6 @@ class IStream(threading.Thread):
 
     self.save_cache()
 
-    UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:93.0) Gecko/20100101 Firefox/93.0'
-    UA_APPLE = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.54 Safari/537.36 Edg/95.0.1020.30'
-    self.base_header = {
-        'User-Agent': UA_APPLE if sys.platform == 'darwin' else UA
-    }
-
     self.is_failed = False
     self.is_leave = False
     self.is_interrupt = False
@@ -292,7 +286,7 @@ class IStream(threading.Thread):
 
   @property
   def percentage(self):
-    return self.size * 100 / self.total_size
+    return 0 if self.total_size == 0 else self.size * 100 / self.total_size
 
   @property
   def cache_info(self):
@@ -321,7 +315,10 @@ class IStream(threading.Thread):
         self.cache_path += '.download'
         self.save_cache()
         if os.path.exists(old_cache_path):
-          os.remove(old_cache_path)
+          try:
+            os.remove(old_cache_path)
+          except FileNotFoundError:
+            pass
       self.is_leave = pass_exists
       if pass_exists:
         self.complete()

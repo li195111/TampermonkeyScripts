@@ -24,11 +24,14 @@ if __name__ == '__main__':
     dir_path = cache_path.parent
     vid_path = dir_path.joinpath(base_name)
     mkv_path = dir_path.joinpath(base_name.replace('mp4','mkv'))
-    logger.info('Process: %s', dir_path.stem)
+    # logger.info('Process: %s', dir_path.stem)
     if vid_path.exists() and not mkv_path.exists():
       cmd = f'avidemux_cli.exe --load "{vid_path}" --output-format MKV --save "{mkv_path}"'
       out = sp.check_output(cmd, shell=True, cwd=avidemux_dir, stderr=sp.STDOUT)
-      is_error = ('Error' in out.decode())
+      try:
+        is_error = ('Error' in out.decode())
+      except UnicodeDecodeError:
+        is_error = ('Error' in out)
       if is_error:
         logger.warning('Remove Error File: %s', dir_path)
         shutil.rmtree(dir_path.as_posix())

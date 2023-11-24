@@ -18,6 +18,7 @@ from StreamBot import MediaType, setup_logger
 
 
 def parse_reels(user_name: str, headers):
+  proj_dir = Path(__file__).parent
   logger = logging.getLogger(__file__)
   logger.setLevel(logging.DEBUG)
   # Get User Profile
@@ -28,7 +29,7 @@ def parse_reels(user_name: str, headers):
 
   timestamp = datetime.now().strftime('%Y%m%dT%H')
   prefix = f'ig_{user_name}_{timestamp}'
-  payload_history_dir = Path('./history')
+  payload_history_dir = proj_dir.joinpath('history')
   payload_history_dir.mkdir(parents=True, exist_ok=True)
   save_path = Path('C:/Users/LIDESKTOP/Downloads/')
   output_prefix = f'ig_bot_{user_name}_{timestamp}'
@@ -195,7 +196,8 @@ def parse_reels(user_name: str, headers):
 
 
 def get_headers(user_name: str):
-  headers_folder_path = Path('headers')
+  proj_dir = Path(__file__).parent
+  headers_folder_path = proj_dir.joinpath('headers')
   with open(headers_folder_path.joinpath(f'{user_name}.json'),
             'r',
             encoding='utf-8') as hfp:

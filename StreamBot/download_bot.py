@@ -29,7 +29,8 @@ class IURLDownloadBot:
     self.__prefix = f'{self.type.value}_bot_'
     self.__src = src_dir
     self.__dst = dst_dir
-    os.makedirs(self.__src, exist_ok=True)
+    if not os.path.exists(self.__src):
+      self.warn('Source path does not exists: %s', self.__src)
     os.makedirs(self.__dst, exist_ok=True)
     self.queue: List[QueueItem] = []
     self.remove_queue: List[QueueItem] = []

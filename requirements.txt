@@ -6,7 +6,7 @@ scipy
 
 pandas
 requests
-pydantic
+pydantic==1.10.7
 
 fastapi
 uvicorn

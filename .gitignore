@@ -9,3 +9,6 @@ ConvertLogs/
 .vscode/
 ig_*.json
 headers/
+bkp/
+*.zip
+

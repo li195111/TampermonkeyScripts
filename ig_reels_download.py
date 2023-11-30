@@ -21,6 +21,7 @@ def parse_reels(user_name: str, headers):
   proj_dir = Path(__file__).parent
   logger = logging.getLogger(__file__)
   logger.setLevel(logging.DEBUG)
+  user_profile_dir = Path(os.environ['USERPROFILE'])
   # Get User Profile
   # parse data.user.id to get <user_id>
   user_profile_url = f'https://www.instagram.com/api/v1/users/web_profile_info/?username={user_name}'
@@ -31,7 +32,7 @@ def parse_reels(user_name: str, headers):
   prefix = f'ig_{user_name}_{timestamp}'
   payload_history_dir = proj_dir.joinpath('history')
   payload_history_dir.mkdir(parents=True, exist_ok=True)
-  save_path = Path('C:/Users/LIDESKTOP/Downloads/')
+  save_path = user_profile_dir.joinpath('Downloads')
   output_prefix = f'ig_bot_{user_name}_{timestamp}'
 
   temp_file = payload_history_dir.joinpath(

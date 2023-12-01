@@ -245,7 +245,7 @@ class DataUser(IBase):
   should_show_public_contacts: bool
   show_account_transparency_details: bool
   transparency_label: Optional[str]
-  transparency_product: str
+  transparency_product: Optional[str]
   username: str
   connected_fb_page: Optional[str]
   pronouns: List[Any]

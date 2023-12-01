@@ -13,10 +13,11 @@ if __name__ == '__main__':
 
   logger = logging.getLogger(__file__)
   logger.setLevel(logging.DEBUG)
+  user_profile_dir = Path(os.environ['USERPROFILE'])
 
   avidemux_dir = "C:/Program Files/Avidemux 2.8 VC++ 64bits"
-  src_dir = 'C:/Users/LIDESKTOP/Downloads'
-  dst_dir = 'G:/Others/Study'
+  src_dir = user_profile_dir.joinpath('Downloads')
+  dst_dir = 'E:/Others/Study'
   finished_vids = glob.glob(f'{dst_dir}/*/*.cache')
   for vid in finished_vids:
     cache_path = Path(vid)

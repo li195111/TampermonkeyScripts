@@ -30,7 +30,7 @@ def parse_reels(user_name: str, headers):
 
   timestamp = datetime.now().strftime('%Y%m%dT%H')
   prefix = f'ig_{user_name}_{timestamp}'
-  payload_history_dir = proj_dir.joinpath('history')
+  payload_history_dir = proj_dir.joinpath('history',user_name)
   payload_history_dir.mkdir(parents=True, exist_ok=True)
   save_path = user_profile_dir.joinpath('Downloads')
   output_prefix = f'ig_bot_{user_name}_{timestamp}'

@@ -1,9 +1,9 @@
-import glob
 import logging
 import os
+import shutil
 import subprocess as sp
 from pathlib import Path
-import shutil
+from typing import List
 
 from StreamBot import setup_logger
 
@@ -15,20 +15,29 @@ if __name__ == '__main__':
   logger.setLevel(logging.DEBUG)
   user_profile_dir = Path(os.environ['USERPROFILE'])
 
-  avidemux_dir = "C:/Program Files/Avidemux 2.8 VC++ 64bits"
+  avidemux_dir = 'C:/Program Files/Avidemux 2.8 VC++ 64bits'
   src_dir = user_profile_dir.joinpath('Downloads')
-  dst_dir = 'E:/Others/Study'
-  finished_vids = glob.glob(f'{dst_dir}/*/*.cache')
-  for vid in finished_vids:
-    cache_path = Path(vid)
+  dst_dirs = [
+      Path('E:/Others/Study'),
+      Path('E:/Others/Study_old'),
+  ]
+  finished_vids: List[Path] = []
+  for dst_dir in dst_dirs:
+    finished_vids.extend(list(dst_dir.rglob('*.cache')))
+  logger.info('Total: %s', len(finished_vids))
+
+  for cache_path in finished_vids:
     base_name = cache_path.stem
     dir_path = cache_path.parent
     vid_path = dir_path.joinpath(base_name)
-    mkv_path = dir_path.joinpath(base_name.replace('mp4','mkv'))
+    mkv_path = dir_path.joinpath(base_name.replace('mp4', 'mkv'))
     # logger.info('Process: %s', dir_path.stem)
     if vid_path.exists() and not mkv_path.exists():
       cmd = f'avidemux_cli.exe --load "{vid_path}" --output-format MKV --save "{mkv_path}"'
-      out = sp.check_output(cmd, shell=True, cwd=avidemux_dir, stderr=sp.STDOUT)
+      out = sp.check_output(cmd,
+                            shell=True,
+                            cwd=avidemux_dir,
+                            stderr=sp.STDOUT)
       try:
         is_error = ('Error' in out.decode())
       except UnicodeDecodeError:

@@ -1,14 +1,19 @@
 import logging
 import os
+import platform
 from pathlib import Path
 
 from StreamBot import BotType, URLDownloadBot, setup_logger
 
 if __name__ == '__main__':
   log_dir = Path(__file__).parent.joinpath('logs')
-  user_profile_dir = Path(os.environ['USERPROFILE'])
-  src_dirs = [user_profile_dir.joinpath('Downloads'), 'D:/Download/']
-  dst_dir = 'E:/Others/Instagram'
+  if platform.system().lower() == 'windows':
+    user_profile_dir = Path(os.environ['USERPROFILE'])
+    src_dirs = [user_profile_dir.joinpath('Downloads'), Path('D:/Download/')]
+    dst_dir = Path('D:/Others/Instagram')
+    dst_dir.mkdir(parents=True, exist_ok=True)
+  elif platform.system().lower() == 'linux':
+    ...
   setup_logger(__file__, log_dir.as_posix())
   logger = logging.getLogger(__file__)
   logger.setLevel(logging.DEBUG)

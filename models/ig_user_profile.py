@@ -249,10 +249,10 @@ class DataUser(IBase):
   username: str
   connected_fb_page: Optional[str]
   pronouns: List[Any]
-  edge_felix_video_timeline: EdgeFelixVideoTimelineClass
-  edge_owner_to_timeline_media: EdgeFelixVideoTimelineClass
-  edge_saved_media: EdgeFelixVideoTimelineClass
-  edge_media_collections: EdgeFelixVideoTimelineClass
+  edge_felix_video_timeline: Optional[EdgeFelixVideoTimelineClass]
+  edge_owner_to_timeline_media: Optional[EdgeFelixVideoTimelineClass]
+  edge_saved_media: Optional[EdgeFelixVideoTimelineClass]
+  edge_media_collections: Optional[EdgeFelixVideoTimelineClass]
 
 class Data(IBase):
   user: DataUser

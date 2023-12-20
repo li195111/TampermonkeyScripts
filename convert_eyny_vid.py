@@ -13,17 +13,16 @@ if __name__ == '__main__':
 
   logger = logging.getLogger(__file__)
   logger.setLevel(logging.DEBUG)
-  user_profile_dir = Path(os.environ['USERPROFILE'])
 
   avidemux_dir = 'C:/Program Files/Avidemux 2.8 VC++ 64bits'
-  src_dir = user_profile_dir.joinpath('Downloads')
   dst_dirs = [
-      Path('E:/Others/Study'),
-      Path('E:/Others/Study_old'),
+      Path('D:/Others/Study'),
+      Path('D:/Others/Study_old'),
   ]
   finished_vids: List[Path] = []
   for dst_dir in dst_dirs:
-    finished_vids.extend(list(dst_dir.rglob('*.cache')))
+    if dst_dir.exists():
+      finished_vids.extend(list(dst_dir.rglob('*.cache')))
   logger.info('Total: %s', len(finished_vids))
 
   for cache_path in finished_vids:

@@ -328,7 +328,7 @@ class ClipsMetadata(IBase):
   asset_recommendation_info: Optional[str]
   contextual_highlight_info: Optional[str]
   clips_creation_entry_point: Optional[str]
-  audio_ranking_info: AudioRankingInfo
+  audio_ranking_info: Optional[AudioRankingInfo]
   template_info: Optional[str]
   is_fan_club_promo_video: bool
   disable_use_in_clips_client_cache: bool

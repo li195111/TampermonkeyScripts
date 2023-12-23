@@ -25,7 +25,7 @@ class ClipsMusicAttributionInfo(IBase):
 
 class DashInfo(IBase):
   is_dash_eligible: bool
-  video_dash_manifest: Optional[str]
+  video_dash_manifest: Optional[str] = None
   number_of_qualities: int
 
 class Dimensions(IBase):
@@ -69,7 +69,7 @@ class Owner(IBase):
 
 class SharingFrictionInfo(IBase):
   should_have_sharing_friction: bool
-  bloks_app_url: Optional[str]
+  bloks_app_url: Optional[str] = None
 
 class StickyNode(IBase):
   typename: str = Field(alias='__typename')
@@ -78,21 +78,21 @@ class StickyNode(IBase):
   dimensions: Dimensions
   display_url: str
   edge_media_to_tagged_user: EdgeMediaToTaggedUser
-  fact_check_overall_rating: Optional[str]
-  fact_check_information: Optional[str]
-  gating_info: Optional[str]
+  fact_check_overall_rating: Optional[str] = None
+  fact_check_information: Optional[str] = None
+  gating_info: Optional[str] = None
   sharing_friction_info: SharingFrictionInfo
-  media_overlay_info: Optional[str]
-  media_preview: Optional[str]
+  media_overlay_info: Optional[str] = None
+  media_preview: Optional[str] = None
   owner: Owner
   is_video: bool
   has_upcoming_event: bool
-  accessibility_caption: Optional[str]
-  dash_info: Optional[DashInfo]
-  has_audio: Optional[bool]
-  tracking_token: Optional[str]
-  video_url: Optional[str]
-  video_view_count: Optional[int]
+  accessibility_caption: Optional[str] = None
+  dash_info: Optional[DashInfo] = None
+  has_audio: Optional[bool] = None
+  tracking_token: Optional[str] = None
+  video_url: Optional[str] = None
+  video_view_count: Optional[int] = None
 
 class EdgeSidecarToChildrenEdge(IBase):
   node: StickyNode
@@ -124,49 +124,49 @@ class PurpleNode(IBase):
   dimensions: Dimensions
   display_url: str
   edge_media_to_tagged_user: EdgeMediaToTaggedUser
-  fact_check_overall_rating: Optional[str]
-  fact_check_information: Optional[str]
-  gating_info: Optional[str]
+  fact_check_overall_rating: Optional[str] = None
+  fact_check_information: Optional[str] = None
+  gating_info: Optional[str] = None
   sharing_friction_info: SharingFrictionInfo
-  media_overlay_info: Optional[str]
-  media_preview: Optional[str]
+  media_overlay_info: Optional[str] = None
+  media_preview: Optional[str] = None
   owner: Owner
   is_video: bool
   has_upcoming_event: bool
-  accessibility_caption: Optional[str]
-  dash_info: Optional[DashInfo]
-  has_audio: Optional[bool]
-  tracking_token: Optional[str]
-  video_url: Optional[str]
-  video_view_count: Optional[int]
+  accessibility_caption: Optional[str] = None
+  dash_info: Optional[DashInfo] = None
+  has_audio: Optional[bool] = None
+  tracking_token: Optional[str] = None
+  video_url: Optional[str] = None
+  video_view_count: Optional[int] = None
   edge_media_to_caption: EdgeMediaToCaption
   edge_media_to_comment: EdgeFollowClass
   comments_disabled: bool
   taken_at_timestamp: int
   edge_liked_by: EdgeFollowClass
   edge_media_preview_like: EdgeFollowClass
-  location: Optional[Location]
-  nft_asset_info: Optional[str]
+  location: Optional[Location] = None
+  nft_asset_info: Optional[str] = None
   thumbnail_src: str
   thumbnail_resources: List[ThumbnailResource]
-  felix_profile_grid_crop: Optional[Union[str, FelixProfileGridCrop]]
+  felix_profile_grid_crop: Optional[Union[str, FelixProfileGridCrop]] = None
   coauthor_producers: List[Any]
   pinned_for_users: List[Any]
   viewer_can_reshare: bool
-  encoding_status: Optional[str]
-  is_published: Optional[bool]
-  product_type: Optional[str]
-  title: Optional[str]
-  video_duration: Optional[float]
-  edge_sidecar_to_children: Optional[EdgeSidecarToChildren]
-  clips_music_attribution_info: Optional[ClipsMusicAttributionInfo]
+  encoding_status: Optional[str] = None
+  is_published: Optional[bool] = None
+  product_type: Optional[str] = None
+  title: Optional[str] = None
+  video_duration: Optional[float] = None
+  edge_sidecar_to_children: Optional[EdgeSidecarToChildren] = None
+  clips_music_attribution_info: Optional[ClipsMusicAttributionInfo] = None
 
 class EdgeFelixVideoTimelineEdge(IBase):
   node: PurpleNode
 
 class PageInfo(IBase):
   has_next_page: bool
-  end_cursor: Optional[str]
+  end_cursor: Optional[str] = None
 
 class EdgeFelixVideoTimelineClass(IBase):
   count: int
@@ -188,24 +188,24 @@ class FBProfileBioLink(IBase):
   name: str
 
 class DataUser(IBase):
-  ai_agent_type: Optional[str]
+  ai_agent_type: Optional[str] = None
   biography: str
   bio_links: List[BioLink]
-  fb_profile_biolink: Optional[Union[str, FBProfileBioLink]]
+  fb_profile_biolink: Optional[Union[str, FBProfileBioLink]] = None
   biography_with_entities: BiographyWithEntities
   blocked_by_viewer: bool
-  restricted_by_viewer: Optional[bool]
+  restricted_by_viewer: Optional[bool] = None
   country_block: bool
   eimu_id: str
-  external_url: Optional[str]
-  external_url_linkshimmed: Optional[str]
+  external_url: Optional[str] = None
+  external_url_linkshimmed: Optional[str] = None
   edge_followed_by: EdgeFollowClass
   fbid: str
   followed_by_viewer: bool
   edge_follow: EdgeFollowClass
   follows_viewer: bool
   full_name: str
-  group_metadata: Optional[str]
+  group_metadata: Optional[str] = None
   has_ar_effects: bool
   has_clips: bool
   has_guides: bool
@@ -223,15 +223,15 @@ class DataUser(IBase):
   is_supervised_user: bool
   is_embeds_disabled: bool
   is_joined_recently: bool
-  guardian_id: Optional[str]
-  business_address_json: Optional[str]
+  guardian_id: Optional[str] = None
+  business_address_json: Optional[str] = None
   business_contact_method: str
-  business_email: Optional[str]
-  business_phone_number: Optional[str]
-  business_category_name: Optional[str]
-  overall_category_name: Optional[str]
-  category_enum: Optional[str]
-  category_name: Optional[str]
+  business_email: Optional[str] = None
+  business_phone_number: Optional[str] = None
+  business_category_name: Optional[str] = None
+  overall_category_name: Optional[str] = None
+  category_enum: Optional[str] = None
+  category_name: Optional[str] = None
   is_private: bool
   is_verified: bool
   is_verified_by_mv4b: bool
@@ -244,15 +244,15 @@ class DataUser(IBase):
   should_show_category: bool
   should_show_public_contacts: bool
   show_account_transparency_details: bool
-  transparency_label: Optional[str]
-  transparency_product: Optional[str]
+  transparency_label: Optional[str] = None
+  transparency_product: Optional[str] = None
   username: str
-  connected_fb_page: Optional[str]
+  connected_fb_page: Optional[str] = None
   pronouns: List[Any]
-  edge_felix_video_timeline: Optional[EdgeFelixVideoTimelineClass]
-  edge_owner_to_timeline_media: Optional[EdgeFelixVideoTimelineClass]
-  edge_saved_media: Optional[EdgeFelixVideoTimelineClass]
-  edge_media_collections: Optional[EdgeFelixVideoTimelineClass]
+  edge_felix_video_timeline: Optional[EdgeFelixVideoTimelineClass] = None
+  edge_owner_to_timeline_media: Optional[EdgeFelixVideoTimelineClass] = None
+  edge_saved_media: Optional[EdgeFelixVideoTimelineClass] = None
+  edge_media_collections: Optional[EdgeFelixVideoTimelineClass] = None
 
 class Data(IBase):
   user: DataUser

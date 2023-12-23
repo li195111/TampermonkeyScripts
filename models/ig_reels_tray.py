@@ -44,7 +44,7 @@ class User(IBase):
   strong_id: str = Field(alias='strong_id__')
   username: str
   is_verified: bool
-  profile_pic_id: Optional[str]
+  profile_pic_id: Optional[str] = None
   profile_pic_url: str
   birthday_today_visibility_for_viewer: BirthdayTodayVisibilityForViewer
   friendship_status: FriendshipStatus
@@ -69,9 +69,9 @@ class Tray(IBase):
   seen_ranked_position: int
   muted: bool
   prefetch_count: int
-  ranker_scores: Optional[RankerScores]
-  story_duration_secs: Optional[int]
-  story_wedge_size: Optional[int]
+  ranker_scores: Optional[RankerScores] = None
+  story_duration_secs: Optional[int] = None
+  story_wedge_size: Optional[int] = None
   has_besties_media: bool
   latest_besties_reel_media: float
   media_count: int
@@ -80,13 +80,13 @@ class Tray(IBase):
   has_fan_club_media: bool
   show_fan_club_stories_teaser: bool
   disabled_reply_types: List[DisabledReplyType]
-  eligible_for_hype: Optional[bool]
+  eligible_for_hype: Optional[bool] = None
 
 class ReelsTray(IBase):
-  tray: Optional[List[Tray]]
-  story_ranking_token: Optional[UUID]
-  story_likes_config: Optional[StoryLikesConfig]
-  quick_snaps: Optional[str]
+  tray: Optional[List[Tray]] = None
+  story_ranking_token: Optional[UUID] = None
+  story_likes_config: Optional[StoryLikesConfig] = None
+  quick_snaps: Optional[str] = None
   broadcasts: List[Any]
   sticker_version: int
   face_filter_nux_version: int

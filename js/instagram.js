@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         InstagramDownloader
 // @namespace    http://tampermonkey.net/
-// @version      0.5
+// @version      0.6
 // @description  try to take over the world!
 // @author       You
 // @match        https://www.instagram.com/*
@@ -122,27 +122,24 @@
     }
     function parse_stories() {
         console.log('Parse Stories');
-        var account_e = document.querySelector('div._ac0b header._ac0k div._ac0o div.x9f619');
+        var account_e = document.querySelector('div.x5yr21d div.x16adzlw div.x6s0dn4 div.x6s0dn4');
         var account_str = '';
         if (account_e != null && account_e.textContent != null) {
             var acct_btn = account_e.querySelector('a');
+            console.log('Account Btn: ', acct_btn);
             if (acct_btn != null && acct_btn.textContent != null) {
-                if (location.pathname.match('/stories/highlights/*')) {
-                    var acct_url_split = acct_btn.href.split('/').filter(function (e) { return e; });
-                    account_str = acct_url_split[acct_url_split.length - 1];
-                }
-                else {
-                    account_str = acct_btn.textContent;
-                }
+                var acct_url_split = acct_btn.href.split('/').filter(function (e) { return e; });
+                account_str = acct_url_split[acct_url_split.length - 1];
             }
         }
-        var curr_story = document.querySelector('div._ac0b');
+        console.log('Account:', account_str);
+        var curr_story = document.querySelector('div.x5yr21d');
         if (curr_story != null) {
             var blob = null;
             var path_name = '';
             var path_split = [];
             var file_name = '';
-            var img = curr_story.querySelector('img');
+            var img = curr_story.querySelector('img.x19kjcj4');
             var src;
             if (img != null) {
                 src = img.src;
@@ -237,7 +234,7 @@
                 if (btn != null) {
                     btn.click();
                 }
-                area = document.querySelector('div._ac0b');
+                area = document.querySelector('div.x5yr21d');
                 if (area != undefined && area != null) {
                     area.appendChild(button);
                     if (urlChangeIntervalID != null) {

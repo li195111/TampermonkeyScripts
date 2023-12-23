@@ -427,7 +427,7 @@ class QueueItem(IBase):
   file_path: str
   file_name: str
   media_type: MediaType
-  urls: Optional[URLs]
+  urls: Optional[URLs] = None
   threads: List[threading.Thread] = []
   state: Union[FileState, int] = FileState.QUEUE
 

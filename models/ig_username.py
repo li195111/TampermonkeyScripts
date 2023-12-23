@@ -9,21 +9,21 @@ class FanConsiderationPageRevampEligiblity(IBase):
   should_show_content_preview: bool
 
 class FanClubInfo(IBase):
-  fan_club_id: Optional[str]
-  fan_club_name: Optional[str]
-  is_fan_club_referral_eligible: Optional[str]
-  fan_consideration_page_revamp_eligiblity: Optional[Union[str,FanConsiderationPageRevampEligiblity]]
-  is_fan_club_gifting_eligible: Optional[str]
-  subscriber_count: Optional[str]
-  connected_member_count: Optional[str]
-  autosave_to_exclusive_highlight: Optional[str]
-  has_enough_subscribers_for_ssc: Optional[str]
+  fan_club_id: Optional[str] = None
+  fan_club_name: Optional[str] = None
+  is_fan_club_referral_eligible: Optional[bool] = None
+  fan_consideration_page_revamp_eligiblity: Optional[Union[str,FanConsiderationPageRevampEligiblity]] = None
+  is_fan_club_gifting_eligible: Optional[bool] = None
+  subscriber_count: Optional[int] = None
+  connected_member_count: Optional[int] = None
+  autosave_to_exclusive_highlight: Optional[bool] = None
+  has_enough_subscribers_for_ssc: Optional[bool] = None
 
 class HDProfilePicURLInfo(IBase):
   url: str
   width: int
   height: int
-  scans_profile: Optional[str]
+  scans_profile: Optional[str] = None
 class CaptionUser(IBase):
   fbid_v2: str
   feed_post_reshare_disabled: bool
@@ -43,7 +43,7 @@ class CaptionUser(IBase):
   hd_profile_pic_versions: List[HDProfilePicURLInfo]
   is_favorite: bool
   is_verified: bool
-  profile_pic_id: Optional[str]
+  profile_pic_id: Optional[str] = None
   profile_pic_url: str
   transparency_product_enabled: bool
   username: str
@@ -66,14 +66,14 @@ class Caption(IBase):
   is_covered: bool
   private_reply_status: int
   media_id: str
-  has_translation: Optional[bool]
+  has_translation: Optional[bool] = None
 
 class CarouselMediaImageVersions2(IBase):
   candidates: List[HDProfilePicURLInfo]
 class SharingFrictionInfo(IBase):
   should_have_sharing_friction: bool
-  bloks_app_url: Optional[str]
-  sharing_friction_payload: Optional[str]
+  bloks_app_url: Optional[str] = None
+  sharing_friction_payload: Optional[str] = None
 
 class UserElement(IBase):
   pk: str
@@ -83,16 +83,16 @@ class UserElement(IBase):
   strong_id: str = Field(alias='strong_id__')
   username: str
   is_verified: bool
-  profile_pic_id: Optional[str]
+  profile_pic_id: Optional[str] = None
   profile_pic_url: str
-  profile_grid_display_type: Optional[str]
-  fbid_v2: Optional[str]
+  profile_grid_display_type: Optional[str] = None
+  fbid_v2: Optional[str] = None
 
 class In(IBase):
   user: UserElement
   position: List[float]
-  start_time_in_video_in_sec: Optional[str]
-  duration_in_video_in_sec: Optional[str]
+  start_time_in_video_in_sec: Optional[str] = None
+  duration_in_video_in_sec: Optional[str] = None
 
 class Usertags(IBase):
   usertags_in: List[In] = Field(alias='in')
@@ -109,40 +109,40 @@ class CarouselMedia(IBase):
   explore_pivot_grid: bool
   product_type: str
   media_type: int
-  accessibility_caption: Optional[str]
+  accessibility_caption: Optional[str] = None
   image_versions2: CarouselMediaImageVersions2
   original_width: int
   original_height: int
   carousel_parent_id: str
   pk: str
   commerciality_status: str
-  preview: Optional[str]
-  usertags: Optional[Usertags]
+  preview: Optional[str] = None
+  usertags: Optional[Usertags] = None
   featured_products: List[Any]
-  shop_routing_user_id: Optional[str]
+  shop_routing_user_id: Optional[str] = None
   sharing_friction_info: SharingFrictionInfo
   product_suggestions: List[Any]
-  video_versions: Optional[List[VideoVersion]]
-  has_audio: Optional[bool]
-  video_duration: Optional[float]
-  is_dash_eligible: Optional[int]
-  video_dash_manifest: Optional[str]
-  video_codec: Optional[str]
-  number_of_qualities: Optional[int]
+  video_versions: Optional[List[VideoVersion]] = None
+  has_audio: Optional[bool] = None
+  video_duration: Optional[float] = None
+  is_dash_eligible: Optional[int] = None
+  video_dash_manifest: Optional[str] = None
+  video_codec: Optional[str] = None
+  number_of_qualities: Optional[int] = None
 
 class AchievementsInfo(IBase):
   show_achievements: bool
-  num_earned_achievements: Optional[str]
+  num_earned_achievements: Optional[str] = None
 
 class AudioReattributionInfo(IBase):
   should_allow_restore: bool
 
 class AdditionalAudioInfo(IBase):
-  additional_audio_username: Optional[str]
+  additional_audio_username: Optional[str] = None
   audio_reattribution_info: AudioReattributionInfo
 
 class AudioRankingInfo(IBase):
-  best_audio_cluster_id: Optional[str]
+  best_audio_cluster_id: Optional[str] = None
 
 class BrandedContentTagInfo(IBase):
   can_add_tag: bool
@@ -157,27 +157,27 @@ class Pill(IBase):
 class EntryPointContainer(IBase):
   pill: Pill
   comment: Comment
-  overflow: Optional[str]
-  ufi: Optional[str]
+  overflow: Optional[str] = None
+  ufi: Optional[str] = None
 
 class ContentAppreciationInfo(IBase):
   enabled: bool
-  entry_point_container: Optional[Union[str, EntryPointContainer]]
+  entry_point_container: Optional[Union[str, EntryPointContainer]] = None
 
 class ConsumptionInfo(IBase):
   is_bookmarked: bool
   should_mute_audio_reason: str
   is_trending_in_clips: bool
-  should_mute_audio_reason_type: Optional[str]
-  display_media_id: Optional[str]
+  should_mute_audio_reason_type: Optional[str] = None
+  display_media_id: Optional[str] = None
 
 class OriginalSoundInfo(IBase):
   audio_asset_id: str
-  music_canonical_id: Optional[str]
+  music_canonical_id: Optional[str] = None
   progressive_download_url: str
   duration_in_ms: int
   dash_manifest: str
-  ig_artist: Optional[Union[str, UserElement]]
+  ig_artist: Optional[Union[str, UserElement]] = None
   should_mute_audio: bool
   hide_remixing: bool
   original_media_id: str
@@ -185,7 +185,7 @@ class OriginalSoundInfo(IBase):
   original_audio_title: str
   consumption_info: ConsumptionInfo
   can_remix_be_shared_to_fb: bool
-  formatted_clips_media_count: Optional[str]
+  formatted_clips_media_count: Optional[str] = None
   allow_creator_to_rename: bool
   audio_parts: List[Any]
   is_explicit: bool
@@ -193,9 +193,9 @@ class OriginalSoundInfo(IBase):
   is_audio_automatically_attributed: bool
   is_reuse_disabled: bool
   is_xpost_from_fb: bool
-  xpost_fb_creator_info: Optional[str]
+  xpost_fb_creator_info: Optional[str] = None
   is_original_audio_download_eligible: bool
-  trend_rank: Optional[str]
+  trend_rank: Optional[str] = None
   audio_filter_infos: List[Any]
   oa_owner_is_music_artist: bool
 
@@ -203,25 +203,25 @@ class MusicAssetInfo(IBase):
   audio_cluster_id: str
   id: str
   title: str
-  sanitized_title: Optional[str]
+  sanitized_title: Optional[str] = None
   subtitle: str
   display_artist: str
-  artist_id: Optional[str]
+  artist_id: Optional[str] = None
   cover_artwork_uri: str
   cover_artwork_thumbnail_uri: str
   progressive_download_url: str
-  reactive_audio_download_url: Optional[str]
-  fast_start_progressive_download_url: Optional[str]
-  web_30_s_preview_download_url: Optional[str]
+  reactive_audio_download_url: Optional[str] = None
+  fast_start_progressive_download_url: Optional[str] = None
+  web_30_s_preview_download_url: Optional[str] = None
   highlight_start_times_in_ms: List[int]
   is_explicit: bool
-  dash_manifest: Optional[str]
+  dash_manifest: Optional[str] = None
   has_lyrics: bool
   audio_asset_id: str
   duration_in_ms: int
-  dark_message: Optional[str]
+  dark_message: Optional[str] = None
   allows_saving: bool
-  ig_username: Optional[str]
+  ig_username: Optional[str] = None
   is_eligible_for_audio_effects: bool
 
 class AudioMutingInfo(IBase):
@@ -231,28 +231,28 @@ class AudioMutingInfo(IBase):
   show_muted_audio_toast: bool
 
 class MusicConsumptionInfo(IBase):
-  ig_artist: Optional[Union[str, UserElement]]
+  ig_artist: Optional[Union[str, UserElement]] = None
   placeholder_profile_pic_url: str
   should_mute_audio: bool
   should_mute_audio_reason: str
-  should_mute_audio_reason_type: Optional[str]
+  should_mute_audio_reason_type: Optional[str] = None
   is_bookmarked: bool
   overlap_duration_in_ms: int
   audio_asset_start_time_in_ms: int
   allow_media_creation_with_music: bool
   is_trending_in_clips: bool
-  trend_rank: Optional[str]
-  formatted_clips_media_count: Optional[str]
-  display_labels: Optional[str]
+  trend_rank: Optional[str] = None
+  formatted_clips_media_count: Optional[str] = None
+  display_labels: Optional[str] = None
   should_allow_music_editing: bool
-  derived_content_id: Optional[str]
+  derived_content_id: Optional[str] = None
   audio_filter_infos: List[Any]
   audio_muting_info: AudioMutingInfo
 
 class MusicInfo(IBase):
   music_asset_info: MusicAssetInfo
   music_consumption_info: MusicConsumptionInfo
-  music_canonical_id: Optional[str]
+  music_canonical_id: Optional[str] = None
 
 class Color(IBase):
   count: int
@@ -278,45 +278,45 @@ class ReusableTextInfo(IBase):
   is_animated: int
 
 class ClipsMetadata(IBase):
-  music_info: Optional[Union[str, MusicInfo]]
-  original_sound_info: Optional[OriginalSoundInfo]
-  audio_type: Optional[str]
+  music_info: Optional[Union[str, MusicInfo]] = None
+  original_sound_info: Optional[OriginalSoundInfo] = None
+  audio_type: Optional[str] = None
   music_canonical_id: str
-  featured_label: Optional[str]
-  mashup_info: Dict[str, Optional[bool]]
-  reusable_text_info: Optional[Union[str, List[ReusableTextInfo]]]
-  reusable_text_attribute_string: Optional[str]
-  nux_info: Optional[str]
-  viewer_interaction_settings: Optional[str]
+  featured_label: Optional[str] = None
+  mashup_info: Dict[str, Optional[bool]] = None
+  reusable_text_info: Optional[Union[str, List[ReusableTextInfo]]] = None
+  reusable_text_attribute_string: Optional[str] = None
+  nux_info: Optional[str] = None
+  viewer_interaction_settings: Optional[str] = None
   branded_content_tag_info: BrandedContentTagInfo
-  shopping_info: Optional[str]
+  shopping_info: Optional[str] = None
   additional_audio_info: AdditionalAudioInfo
   is_shared_to_fb: bool
-  breaking_content_info: Optional[str]
-  challenge_info: Optional[str]
-  reels_on_the_rise_info: Optional[str]
-  breaking_creator_info: Optional[str]
-  asset_recommendation_info: Optional[str]
-  contextual_highlight_info: Optional[str]
+  breaking_content_info: Optional[str] = None
+  challenge_info: Optional[str] = None
+  reels_on_the_rise_info: Optional[str] = None
+  breaking_creator_info: Optional[str] = None
+  asset_recommendation_info: Optional[str] = None
+  contextual_highlight_info: Optional[str] = None
   clips_creation_entry_point: str
   audio_ranking_info: AudioRankingInfo
-  template_info: Optional[str]
+  template_info: Optional[str] = None
   is_fan_club_promo_video: bool
   disable_use_in_clips_client_cache: bool
   content_appreciation_info: ContentAppreciationInfo
   achievements_info: AchievementsInfo
   show_achievements: bool
-  show_tips: Optional[str]
-  merchandising_pill_info: Optional[str]
+  show_tips: Optional[str] = None
+  merchandising_pill_info: Optional[str] = None
   is_public_chat_welcome_video: bool
   professional_clips_upsell_type: int
-  external_media_info: Optional[str]
+  external_media_info: Optional[str] = None
 
 class CommentInformTreatment(IBase):
   should_have_inform_treatment: bool
   text: str
-  url: Optional[str]
-  action_type: Optional[str]
+  url: Optional[str] = None
+  action_type: Optional[str] = None
 
 class Comment(IBase):
   pk: str
@@ -335,15 +335,15 @@ class Comment(IBase):
   is_covered: bool
   private_reply_status: int
   media_id: str
-  has_translation: Optional[bool]
+  has_translation: Optional[bool] = None
   has_liked_comment: bool
   comment_like_count: int
-  parent_comment_id: Optional[str]
+  parent_comment_id: Optional[str] = None
 
 class AdditionalCandidates(IBase):
   igtv_first_frame: HDProfilePicURLInfo
   first_frame: HDProfilePicURLInfo
-  smart_frame: Optional[str]
+  smart_frame: Optional[str] = None
 
 class Default(IBase):
   video_length: float
@@ -364,9 +364,9 @@ class ScrubberSpritesheetInfoCandidates(IBase):
 
 class ItemImageVersions2(IBase):
   candidates: List[HDProfilePicURLInfo]
-  additional_candidates: Optional[AdditionalCandidates]
-  smart_thumbnail_enabled: Optional[bool]
-  scrubber_spritesheet_info_candidates: Optional[ScrubberSpritesheetInfoCandidates]
+  additional_candidates: Optional[AdditionalCandidates] = None
+  smart_thumbnail_enabled: Optional[bool] = None
+  scrubber_spritesheet_info_candidates: Optional[ScrubberSpritesheetInfoCandidates] = None
 
 class Location(IBase):
   pk: str
@@ -377,8 +377,8 @@ class Location(IBase):
   address: str
   city: str
   has_viewer_saved: bool
-  lng: Optional[float]
-  lat: Optional[float]
+  lng: Optional[float] = None
+  lat: Optional[float] = None
   is_eligible_for_guides: bool
 
 class MediaAppreciationSettings(IBase):
@@ -392,14 +392,14 @@ class SquareCrop(IBase):
   crop_bottom: float
 
 class MediaCroppingInfo(IBase):
-  square_crop: Optional[SquareCrop]
+  square_crop: Optional[SquareCrop] = None
 
 class MusicMetadata(IBase):
   music_canonical_id: int
-  audio_type: Optional[str]
-  music_info: Optional[Union[str, MusicInfo]]
-  original_sound_info: Optional[OriginalSoundInfo]
-  pinned_media_ids: Optional[Union[str, List[str]]]
+  audio_type: Optional[str] = None
+  music_info: Optional[Union[str, MusicInfo]] = None
+  original_sound_info: Optional[OriginalSoundInfo] = None
+  pinned_media_ids: Optional[Union[str, List[str]]] = None
 
 class Item(IBase):
   taken_at: int
@@ -421,9 +421,9 @@ class Item(IBase):
   is_visual_reply_commenter_notice_enabled: bool
   commerciality_status: str
   explore_hide_comments: bool
-  usertags: Optional[Usertags]
-  photo_of_you: Optional[bool]
-  shop_routing_user_id: Optional[str]
+  usertags: Optional[Usertags] = None
+  photo_of_you: Optional[bool] = None
+  shop_routing_user_id: Optional[str] = None
   can_see_insights_as_brand: bool
   is_organic_product_tagging_eligible: bool
   has_liked: bool
@@ -433,7 +433,7 @@ class Item(IBase):
   media_type: int
   code: str
   can_viewer_reshare: bool
-  caption: Optional[Caption]
+  caption: Optional[Caption] = None
   clips_tab_pinned_user_ids: List[Any]
   comment_inform_treatment: CommentInformTreatment
   sharing_friction_info: SharingFrictionInfo
@@ -450,55 +450,55 @@ class Item(IBase):
   original_height: int
   product_type: str
   is_paid_partnership: bool
-  location: Optional[Location]
-  music_metadata: Optional[MusicMetadata]
+  location: Optional[Location] = None
+  music_metadata: Optional[MusicMetadata] = None
   organic_tracking_token: str
   ig_media_sharing_disabled: bool
-  lng: Optional[float]
-  lat: Optional[float]
+  lng: Optional[float] = None
+  lat: Optional[float] = None
   is_open_to_public_submission: bool
-  carousel_media_count: Optional[int]
-  carousel_media: Optional[List[CarouselMedia]]
-  carousel_media_ids: Optional[List[str]]
-  carousel_media_pending_post_count: Optional[int]
-  comment_likes_enabled: Optional[bool]
+  carousel_media_count: Optional[int] = None
+  carousel_media: Optional[List[CarouselMedia]] = None
+  carousel_media_ids: Optional[List[str]] = None
+  carousel_media_pending_post_count: Optional[int] = None
+  comment_likes_enabled: Optional[bool] = None
   comment_threading_enabled: bool
   max_num_visible_preview_comments: int
-  has_more_comments: Optional[bool]
-  next_max_id: Optional[str]
-  preview_comments: Optional[List[Comment]]
-  comments: Optional[List[Comment]]
+  has_more_comments: Optional[bool] = None
+  next_max_id: Optional[str] = None
+  preview_comments: Optional[List[Comment]] = None
+  comments: Optional[List[Comment]] = None
   comment_count: int
-  can_view_more_preview_comments: Optional[bool]
-  hide_view_all_comment_entrypoint: Optional[bool]
-  inline_composer_display_condition: Optional[str]
+  can_view_more_preview_comments: Optional[bool] = None
+  hide_view_all_comment_entrypoint: Optional[bool] = None
+  inline_composer_display_condition: Optional[str] = None
   has_delayed_metadata: bool
   is_auto_created: bool
   is_quiet_post: bool
   is_cutout_sticker_allowed: bool
-  fb_like_count: Optional[int]
-  video_subtitles_confidence: Optional[float]
-  video_subtitles_uri: Optional[str]
-  play_count: Optional[int]
-  fb_play_count: Optional[int]
-  media_appreciation_settings: Optional[MediaAppreciationSettings]
-  media_cropping_info: Optional[MediaCroppingInfo]
-  is_artist_pick: Optional[bool]
-  is_third_party_downloads_eligible: Optional[bool]
-  clips_metadata: Optional[ClipsMetadata]
-  is_dash_eligible: Optional[int]
-  video_dash_manifest: Optional[str]
-  video_codec: Optional[str]
-  number_of_qualities: Optional[int]
-  video_versions: Optional[List[VideoVersion]]
-  has_audio: Optional[bool]
-  video_duration: Optional[float]
+  fb_like_count: Optional[int] = None
+  video_subtitles_confidence: Optional[float] = None
+  video_subtitles_uri: Optional[str] = None
+  play_count: Optional[int] = None
+  fb_play_count: Optional[int] = None
+  media_appreciation_settings: Optional[MediaAppreciationSettings] = None
+  media_cropping_info: Optional[MediaCroppingInfo] = None
+  is_artist_pick: Optional[bool] = None
+  is_third_party_downloads_eligible: Optional[bool] = None
+  clips_metadata: Optional[ClipsMetadata] = None
+  is_dash_eligible: Optional[int] = None
+  video_dash_manifest: Optional[str] = None
+  video_codec: Optional[str] = None
+  number_of_qualities: Optional[int] = None
+  video_versions: Optional[List[VideoVersion]] = None
+  has_audio: Optional[bool] = None
+  video_duration: Optional[float] = None
 
 class InsUsername(IBase):
   items: List[Item]
   num_results: int
-  more_available: Optional[bool]
-  next_max_id: Optional[str]
-  user: Optional[UserElement]
-  auto_load_more_enabled: Optional[bool]
+  more_available: Optional[bool] = None
+  next_max_id: Optional[str] = None
+  user: Optional[UserElement] = None
+  auto_load_more_enabled: Optional[bool] = None
   status: str

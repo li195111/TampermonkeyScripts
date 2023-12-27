@@ -87,11 +87,11 @@ class ReelsTray(IBase):
   story_ranking_token: Optional[UUID] = None
   story_likes_config: Optional[StoryLikesConfig] = None
   quick_snaps: Optional[str] = None
-  broadcasts: List[Any]
-  sticker_version: int
-  face_filter_nux_version: int
-  stories_viewer_gestures_nux_eligible: bool
-  has_new_nux_story: bool
-  refresh_window_ms: int
-  response_timestamp: int
+  broadcasts: Optional[List[Any]] = None
+  sticker_version: Optional[int] = None
+  face_filter_nux_version: Optional[int] = None
+  stories_viewer_gestures_nux_eligible: Optional[bool] = None
+  has_new_nux_story: Optional[bool] = None
+  refresh_window_ms: Optional[int] = None
+  response_timestamp: Optional[int] = None
   status: str

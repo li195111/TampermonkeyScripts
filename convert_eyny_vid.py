@@ -16,8 +16,8 @@ if __name__ == '__main__':
 
   avidemux_dir = 'C:/Program Files/Avidemux 2.8 VC++ 64bits'
   dst_dirs = [
-      Path('D:/Others/Study'),
-      Path('D:/Others/Study_old'),
+      Path('D:/QChoiceNAS/SynologyDrive/Others/Study'),
+      Path('D:/QChoiceNAS/SynologyDrive/Others/Study_old'),
   ]
   finished_vids: List[Path] = []
   for dst_dir in dst_dirs:

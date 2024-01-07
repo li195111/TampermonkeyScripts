@@ -166,10 +166,10 @@ class Item(IBase):
   is_first_take: bool
   is_rollcall_v2: bool
   is_superlative: bool
-  is_fb_post_from_fb_story: bool
+  is_fb_post_from_fb_story: Optional[bool] = None
   can_play_spotify_audio: bool
   archive_story_deletion_ts: int
-  created_from_add_yours_browsing: bool
+  created_from_add_yours_browsing: Optional[bool] = None
   story_link_stickers: Optional[List[Story]] = None
   story_bloks_stickers: Optional[List[StoryBloksSticker]] = None
   has_liked: bool

@@ -4,6 +4,7 @@ __pycache__/
 *.png
 *.jpg
 *.svg
+*.webp
 node_modules/
 ConvertLogs/
 .vscode/
@@ -11,4 +12,3 @@ ig_*.json
 headers/
 bkp/
 *.zip
-

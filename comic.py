@@ -22,7 +22,7 @@
 # cv2.waitKey(0)
 # cv2.destroyAllWindows()
 import os
-import glob
+from pathlib import Path
 from typing import Union
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
@@ -34,9 +34,10 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get('/', response_class=HTMLResponse)
 async def index(req: Request):
-  ver_dir = 'static/*/*.jpg'
-  img_paths = glob.glob(ver_dir, recursive=True)
-  img_eles = [f'<div class="img-block"><img src="{path}"></div>' for path in img_paths]
+  ver_dir = Path('static')
+  img_paths = [p for p in list(ver_dir.rglob('*')) if not p.is_dir() and not p.name.split('.')[-1] in ['css','js']]
+  img_paths.sort(key=lambda x: int(x.parent.name.split('_')[0]))
+  img_eles = [f'<div class="img-block"><img src="{path}"></div>' for path in img_paths if not path.is_dir()]
   html = f"""
   <!DOCTYPE html>
     <html lang="zh-tw">
@@ -55,26 +56,26 @@ async def index(req: Request):
   return html
 
 
-@app.get("/comic")
-def read_item(q: Union[str, None] = None):
-  imgs = os.listdir('F:/Study/妹妹的義務/25_219293')
-  print(imgs)
-  html = '''
-  <!DOCTYPE html>
-  <html lang="zh-tw">
+# @app.get("/comic")
+# def read_item(q: Union[str, None] = None):
+#   imgs = os.listdir('F:/Study/妹妹的義務/25_219293')
+#   print(imgs)
+#   html = '''
+#   <!DOCTYPE html>
+#   <html lang="zh-tw">
 
-  <head>
-    <meta charset="utf-8" />
-    <title>Comic Viewer</title>
-  </head>
+#   <head>
+#     <meta charset="utf-8" />
+#     <title>Comic Viewer</title>
+#   </head>
 
-  <body style="background-color: #FFFFFF;">
-    <script>
+#   <body style="background-color: #FFFFFF;">
+#     <script>
       
-    </script>
-  </body>
-  '''
-  return
+#     </script>
+#   </body>
+#   '''
+#   return
 
 
 if __name__ == "__main__":

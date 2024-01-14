@@ -158,7 +158,7 @@ class CarouselMedia(IBase):
 
 
 class AchievementsInfo(IBase):
-  show_achievements: bool
+  show_achievements: Optional[bool] = None
   num_earned_achievements: Optional[str] = None
 
 
@@ -365,7 +365,7 @@ class ClipsMetadata(IBase):
   disable_use_in_clips_client_cache: bool
   content_appreciation_info: ContentAppreciationInfo
   achievements_info: AchievementsInfo
-  show_achievements: bool
+  show_achievements: Optional[bool] = None
   show_tips: Optional[str] = None
   merchandising_pill_info: Optional[str] = None
   is_public_chat_welcome_video: bool

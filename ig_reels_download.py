@@ -230,7 +230,7 @@ if __name__ == '__main__':
   bot_user_name = '__j__a.s'
 
   user_names = [
-      # 'freyaachuang',
+      'freyaachuang',
       'joanne_722',
       'rosso.tw',
       'we_love_mius',

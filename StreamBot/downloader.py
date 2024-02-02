@@ -92,10 +92,10 @@ class Stream(IStream):
         speed_ratio = self.datas_numb / time_delta.total_seconds()
 
         pct_len = 7
-        pct_str = f"{self.percentage:.2f}%"
+        pct_str = f"{self.percentage:02.2f}%"
         pct_str = f'{pct_str}{" " * (pct_len - len(pct_str))}'
-        ratio_str = f"{self.size/(1024**(int(self.total_level)+1)):.2f}/{self.total_numb:.2f} {self.total_level.name}"
-        speed_str = f"{speed_ratio:.2f} {self.datas_level.name}/s"
+        ratio_str = f"{self.size/(1024**(int(self.total_level)+1)):03.2f}/{self.total_numb:03.2f} {self.total_level.name}"
+        speed_str = f"{speed_ratio:02.2f} {self.datas_level.name}/s"
 
         status_string = f"{start_time_str:15s} {pct_str:7s} {ratio_str:10s} {speed_str:10s} {curr_time_str:15s} {self.url.dir_name[5:20]:15}"
         num_pad = self.progress_length - len(status_string)
@@ -156,6 +156,9 @@ class Stream(IStream):
           self.logger.warning(msg)
           self.interrupt()
           self.save()
+        except requests.exceptions.ChunkedEncodingError as err:
+          self.logger.warning(f"ChunkedEncodingError: {self.url.dir_name} {err.args}")
+          self.failed()
         except Exception as err:
           self.logger.warning(f"Failed: {self.url.dir_name} {err.args}")
           error = Error(message={"result": error_msg(err)})

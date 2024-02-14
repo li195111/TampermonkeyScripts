@@ -549,7 +549,7 @@ class Item(IBase):
   can_view_more_preview_comments: Optional[bool] = None
   hide_view_all_comment_entrypoint: Optional[bool] = None
   inline_composer_display_condition: Optional[str] = None
-  has_delayed_metadata: bool
+  has_delayed_metadata: Optional[bool] = None
   is_auto_created: bool
   is_quiet_post: bool
   is_cutout_sticker_allowed: bool

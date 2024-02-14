@@ -149,7 +149,7 @@ class Item(IBase):
   ig_media_sharing_disabled: bool
   crosspost: Optional[List[Crosspost]] = None
   is_open_to_public_submission: bool
-  has_delayed_metadata: bool
+  has_delayed_metadata: Optional[bool] = None
   is_auto_created: bool
   is_cutout_sticker_allowed: bool
   is_dash_eligible: Optional[int] = None

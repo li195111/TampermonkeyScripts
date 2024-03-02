@@ -22,7 +22,7 @@ log_config = {
         "file": {
             "formatter": "file",
             "class": "logging.handlers.TimedRotatingFileHandler",
-            "filename": "logs/QCAS.log",
+            "filename": "logs/StreamDownloader.log",
             "when": "D",  # Daily rotation
             "interval": 1,  # Rotate once a day
             "backupCount": 30,  # Keep last 7 days logs
@@ -47,7 +47,7 @@ class logger:
     def __new__(self,
                 name,
                 level: int = 20,
-                log_filename: str = 'QCAS.log',
+                log_filename: str = 'StreamDownloader.log',
                 std_out: bool = True,
                 interval=log_config['handlers']['file']['interval'],
                 when=log_config['handlers']['file']['when'],

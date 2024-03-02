@@ -6,11 +6,11 @@ import threading
 from typing import List, Optional, Union
 from urllib.parse import urlparse
 
-from models.base import IBase, Log
+from models.base import IBase, Log, LogThread
 
 from .enums import FileSizeLevel, FileState, MediaType
 from .utils import count_bytes_level
-from models.logger import logger
+
 
 class ErrorMsg(IBase):
     result: str
@@ -33,12 +33,10 @@ class CacheInfo(IBase):
     size: int = 0
 
 
-class URL(object):
+class URL(Log):
 
     def __init__(self, url: str, save_dir: str = '.') -> None:
-        self.logger = logger(name=self.__class__.__name__,
-                             level=10 if os.getenv("DEBUG") else 20)
-
+        super().__init__()
         self.__url = url
         self.__parsed_result = urlparse(self.__url)
         self.__save_dir = os.path.abspath(save_dir)
@@ -211,13 +209,10 @@ class URLs(IURLs):
         return super().from_file(file_path, bot_prefix, media_type, dst_dir)
 
 
-class IStream(threading.Thread):
+class IStream(LogThread):
 
     def __init__(self, url: URL, max_connect: int = 3, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self.logger = logger(name=self.__class__.__name__,
-                             level=10 if os.getenv("DEBUG") else 20)
-
         self.__datas = bytearray(bytes(0))
         self.__datas_numb, self.__datas_level = count_bytes_level(self.size)
         self.__total_size = 0
@@ -405,13 +400,10 @@ class IStream(threading.Thread):
         self.is_interrupt = True
 
 
-class IMedia(threading.Thread):
+class IMedia(LogThread):
 
     def __init__(self, url: URL, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self.logger = logger(name=self.__class__.__name__,
-                             level=10 if os.getenv("DEBUG") else 20)
-
         self.url = url
         self.is_finished = False
         self.is_failed = False

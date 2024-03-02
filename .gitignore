@@ -12,3 +12,4 @@ ig_*.json
 headers/
 bkp/
 *.zip
+.env

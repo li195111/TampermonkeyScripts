@@ -1,12 +1,6 @@
 import os
 
-import pydantic
-
 from models.logger import logger
-
-
-class IBase(pydantic.BaseModel):
-    ...
 
 
 class Log(object):

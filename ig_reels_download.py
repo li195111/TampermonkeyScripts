@@ -1,8 +1,8 @@
 import json
-import logging
 import os
 import random
 import time
+from argparse import ArgumentParser
 from datetime import datetime
 from pathlib import Path
 from urllib.parse import urlparse
@@ -13,14 +13,15 @@ from models.ig_feed_user import FeedUser
 from models.ig_reels import InsReels
 from models.ig_reels_tray import ReelsTray
 from models.ig_user_profile import UserProfile
-from models.ig_username import InsUsername
-from StreamBot import MediaType, setup_logger
+from models.logger import logger
+from StreamBot import MediaType
 
 
 def parse_reels(user_name: str, headers):
-    proj_dir = Path(__file__).parent
-    logger = logging.getLogger(__file__)
-    logger.setLevel(logging.DEBUG)
+    file_path = Path(__file__)
+    proj_dir = file_path.parent
+    log = logger(name='ReelsDLR', level=10 if os.getenv("DEBUG") else 20)
+
     user_profile_dir = Path(os.environ['USERPROFILE'])
     # Get User Profile
     # parse data.user.id to get <user_id>
@@ -40,18 +41,18 @@ def parse_reels(user_name: str, headers):
     url = user_profile_url
     if not os.path.exists(temp_file):
         resp = requests.get(url, headers=headers)
-        logger.info('Parse State: %s', resp.status_code)
+        log.info('Parse State: %s', resp.status_code)
         with open(temp_file, 'w', encoding='utf-8') as fp:
             payload = resp.json()
             fp.write(json.dumps(payload, indent=2))
     else:
-        logger.warning(f'Parse Exists: {Path(temp_file).name}')
+        log.warning(f'Parse Exists: {Path(temp_file).name}')
         with open(temp_file, 'r', encoding='utf-8') as fp:
             payload = json.loads(fp.read())
     userprofile = UserProfile(**payload)
     user_id = str(userprofile.data.user.id)
-    logger.info('User: %s', userprofile.data.user.full_name)
-    logger.info('User ID: %s', user_id)
+    log.info('User: %s', userprofile.data.user.full_name)
+    log.info('User ID: %s', user_id)
 
     # # Get Username Payload
     # ig_username_payload_url = f'https://www.instagram.com/api/v1/feed/user/{user_name}/username/?count=12'
@@ -80,13 +81,13 @@ def parse_reels(user_name: str, headers):
     url = ig_reels_tray_url
     if not os.path.exists(temp_file):
         resp = requests.get(url, headers=headers)
-        logger.info('Parse State: %s', resp.status_code)
+        log.info('Parse State: %s', resp.status_code)
         rm_file = False
         with open(temp_file, 'w', encoding='utf-8') as fp:
             try:
                 payload = resp.json()
             except Exception as err:
-                logger.warning('Parse Failed, Please Check Headers')
+                log.warning('Parse Failed, Please Check Headers')
                 rm_file = True
             fp.write(json.dumps(payload, indent=2))
         if rm_file:
@@ -99,13 +100,13 @@ def parse_reels(user_name: str, headers):
     story_id = None
     for tray in reels_tray.tray:
         if tray.id == user_id:
-            logger.info('ReelsTray ID: %s', tray.id)
-            logger.info('ReelsTray User: %s', tray.user.full_name)
-            logger.info('ReelsTray Username: %s', tray.user.username)
-            logger.info('Media Ids: %s', tray.media_ids)
+            log.info('ReelsTray ID: %s', tray.id)
+            log.info('ReelsTray User: %s', tray.user.full_name)
+            log.info('ReelsTray Username: %s', tray.user.username)
+            log.info('Media Ids: %s', tray.media_ids)
             if len(tray.media_ids) > 0:
                 story_id = tray.media_ids[-1]
-                logger.info('Lastest Story ID: %s', story_id)
+                log.info('Lastest Story ID: %s', story_id)
     if story_id is not None:
         ig_stories_url = f'https://www.instagram.com/stories/{user_name}/{story_id}/'
         ig_media_url = f'https://www.instagram.com/api/v1/feed/reels_media/?media_id={story_id}&reel_ids={user_id}'
@@ -114,7 +115,7 @@ def parse_reels(user_name: str, headers):
         url = ig_media_url
         if not os.path.exists(temp_file):
             resp = requests.get(url, headers=headers)
-            logger.info('Parse State: %s', resp.status_code)
+            log.info('Parse State: %s', resp.status_code)
             with open(temp_file, 'w', encoding='utf-8') as fp:
                 payload = resp.json()
                 fp.write(json.dumps(payload, indent=2))
@@ -130,7 +131,7 @@ def parse_reels(user_name: str, headers):
                       'w',
                       encoding='utf-8') as img_fp:
                 img_fp.write(img_url)
-            logger.info('%s Image: %s', idx, img_name)
+            log.info('%s Image: %s', idx, img_name)
             if item.video_versions is not None and len(item.video_versions) > 0:
                 vid_url = item.video_versions[0].url
                 vid_name = urlparse(vid_url).path.split('/')[-1]
@@ -139,9 +140,9 @@ def parse_reels(user_name: str, headers):
                           'w',
                           encoding='utf-8') as vid_fp:
                     vid_fp.write(vid_url)
-                logger.info('%s Video: %s', idx, vid_name)
+                log.info('%s Video: %s', idx, vid_name)
     else:
-        logger.warning('Story ID is None')
+        log.warning('Story ID is None')
         # # 精選
         # ig_feed_user_url = f'https://www.instagram.com/api/v1/feed/user/{user_id}/?count=12&max_id={ins_username.next_max_id}'
         # temp_file = payload_history_dir.joinpath(f'{prefix}_{next_max_id}_feed_user_payload.json').as_posix()
@@ -164,17 +165,17 @@ def parse_reels(user_name: str, headers):
     url = ig_feed_user_url
     if not Path(temp_file).exists():
         resp = requests.get(url, headers=headers)
-        logger.info('Parse State: %s', resp.status_code)
+        log.info('Parse State: %s', resp.status_code)
         with open(temp_file, 'w', encoding='utf-8') as fp:
             payload = resp.json()
             fp.write(json.dumps(payload, indent=2))
     else:
-        logger.warning(f'Parse Exists: {Path(temp_file).name}')
+        log.warning(f'Parse Exists: {Path(temp_file).name}')
         with open(temp_file, 'r', encoding='utf-8') as fp:
             payload = json.loads(fp.read())
     feed_user = FeedUser(**payload)
     if feed_user.user is None:
-        logger.warning(f'No Avaliable User Found: {user_name}')
+        log.warning(f'No Avaliable User Found: {user_name}')
         return
     for idx, feed in enumerate(feed_user.items):
         img_url = feed.image_versions2.candidates[0].url
@@ -184,7 +185,7 @@ def parse_reels(user_name: str, headers):
         if not img_file.exists():
             with open(img_file.as_posix(), 'w', encoding='utf-8') as img_fp:
                 img_fp.write(img_url)
-        logger.info('%s Image: %s', idx, img_name)
+        log.info('%s Image: %s', idx, img_name)
         if feed.video_versions is not None:
             vid_url = feed.video_versions[0].url
             vid_name = urlparse(vid_url).path.split('/')[-1]
@@ -193,7 +194,7 @@ def parse_reels(user_name: str, headers):
             if not vid_file.exists():
                 with open(vid_file.as_posix(), 'w', encoding='utf-8') as vid_fp:
                     vid_fp.write(vid_url)
-            logger.info('%s Video: %s', idx, vid_name)
+            log.info('%s Video: %s', idx, vid_name)
 
 
 def get_headers(user_name: str):
@@ -222,10 +223,16 @@ def get_headers(user_name: str):
     return headers
 
 
-if __name__ == '__main__':
-    log_dir = os.path.join(os.path.dirname(__file__), 'logs')
-    setup_logger(__file__, log_dir)
+def options():
+    parser = ArgumentParser()
+    parser.add_argument('--bot', '-b', type=str,
+                        default='__j__a.s', help='Bot User')
+    parser.add_argument('--user', '-u', type=str, help='User Name')
+    return parser.parse_args()
 
+
+if __name__ == '__main__':
+    opts = options()
     bot_user_name = 'li195111'
     bot_user_name = '__j__a.s'
 
@@ -268,7 +275,10 @@ if __name__ == '__main__':
         'akaonikou',
     ]
 
-    headers = get_headers(bot_user_name)
-    for user_ in user_names:
-        parse_reels(user_name=user_, headers=headers)
-        time.sleep(random.random() + random.random() + 0.5)
+    headers = get_headers(opts.bot)
+    if not opts.user:
+        for user_ in user_names:
+            parse_reels(user_name=user_, headers=headers)
+            time.sleep(random.random() + random.random() + 0.5)
+    else:
+        parse_reels(user_name=opts.user, headers=headers)

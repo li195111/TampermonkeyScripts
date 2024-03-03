@@ -13,3 +13,4 @@ headers/
 bkp/
 *.zip
 .env
+*.log

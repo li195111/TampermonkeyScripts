@@ -4,7 +4,6 @@ logger object
 import logging
 import os
 import sys
-from logging.config import dictConfig
 from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path
 
@@ -66,10 +65,12 @@ class logger:
         if log_filename:
             log_dir = Path(os.getenv("LOG_DIR") or "logs")
             log_dir.mkdir(exist_ok=True)
+            log_config['handlers']['file']['filename'] = log_dir.joinpath(
+                log_filename).as_posix()
 
             self.time_rotate_hanlder = TimedRotatingFileHandler(
                 # housekeeping is delete file by this filename as prefix
-                filename=log_dir.joinpath(log_filename),
+                filename=log_config['handlers']['file']['filename'],
                 interval=interval,
                 when=when,  # one file every {interval} Day
                 backupCount=backupCount,  # keep latest 30 files
@@ -80,9 +81,6 @@ class logger:
         for h in handlers:
             lg.addHandler(h)
         return lg
-
-
-dictConfig(log_config)
 
 
 if __name__ == "__main__":

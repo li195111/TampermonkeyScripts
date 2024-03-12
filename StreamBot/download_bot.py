@@ -102,12 +102,21 @@ class IURLDownloadBot(Log):
         return [item.file_path for item in self.queue]
 
     def match_queue(self, file_name: str):
+        result = []
         try:
             file_name = file_name.replace('[','\[').replace(']','\]')
             pattern = re.compile(rf'{file_name}')
         except re.error:
-            print(f're.compile Error: {file_name}')
-        return [q for q in self.queue if pattern.search(q.file_name, re.IGNORECASE)]
+            self.log(f're.compile Error: {file_name}')
+        try:
+            result = [q for q in self.queue if pattern.search(q.file_name, re.IGNORECASE)]
+        except re.error:
+            self.log(f're.search Error: {file_name}')
+        except NameError:
+            self.log(f'NameError: {file_name}')
+        except Exception as e:
+            self.log(f'Error: {e}')
+        return result
 
     def download_stream(self, url: URL, load_cache: bool = True):
         return self.downloader.download_stream_file(url, load_cache)

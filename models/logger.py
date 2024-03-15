@@ -4,6 +4,7 @@ logger object
 import logging
 import os
 import sys
+import time
 from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path
 
@@ -34,6 +35,13 @@ log_config = {
     },
 }
 
+class CustTimedRotatingFileHandler(TimedRotatingFileHandler):
+
+    def rotate(self, source: str, dest: str) -> None:
+        try:
+            return super().rotate(source, dest)
+        except PermissionError:
+            ...
 
 class logger:
     """
@@ -68,13 +76,14 @@ class logger:
             log_config['handlers']['file']['filename'] = log_dir.joinpath(
                 log_filename).as_posix()
 
-            self.time_rotate_hanlder = TimedRotatingFileHandler(
+            self.time_rotate_hanlder = CustTimedRotatingFileHandler(
                 # housekeeping is delete file by this filename as prefix
                 filename=log_config['handlers']['file']['filename'],
                 interval=interval,
                 when=when,  # one file every {interval} Day
                 backupCount=backupCount,  # keep latest 30 files
                 encoding="utf-8")
+            self.time_rotate_hanlder.doRollover()
             self.time_rotate_hanlder.setFormatter(formatter)
             handlers.append(self.time_rotate_hanlder)
 

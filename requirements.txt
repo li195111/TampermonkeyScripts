@@ -10,3 +10,5 @@ pydantic==1.10.7
 
 fastapi
 uvicorn
+
+concurrent-log-handler

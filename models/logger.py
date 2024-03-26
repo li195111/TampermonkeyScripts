@@ -4,9 +4,11 @@ logger object
 import logging
 import os
 import sys
-import time
+import threading
 from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path
+
+from concurrent_log_handler import ConcurrentRotatingFileHandler
 
 log_config = {
     "version": 1,
@@ -35,13 +37,13 @@ log_config = {
     },
 }
 
+
 class CustTimedRotatingFileHandler(TimedRotatingFileHandler):
 
-    def rotate(self, source: str, dest: str) -> None:
-        try:
-            return super().rotate(source, dest)
-        except PermissionError:
-            ...
+    def doRollover(self):
+        with threading.Lock():
+            super().doRollover()
+
 
 class logger:
     """
@@ -69,23 +71,26 @@ class logger:
             stream_handler = logging.StreamHandler(stream=sys.stdout)
             stream_handler.setFormatter(formatter)
             handlers.append(stream_handler)
-        self.time_rotate_hanlder = None
+        # self.time_rotate_hanlder = None
         if log_filename:
             log_dir = Path(os.getenv("LOG_DIR") or "logs")
             log_dir.mkdir(exist_ok=True)
             log_config['handlers']['file']['filename'] = log_dir.joinpath(
                 log_filename).as_posix()
+            handler = ConcurrentRotatingFileHandler(
+                log_dir.joinpath(log_filename), "a", 512*1024, backupCount)
+            handler.setFormatter(formatter)
 
-            self.time_rotate_hanlder = CustTimedRotatingFileHandler(
-                # housekeeping is delete file by this filename as prefix
-                filename=log_config['handlers']['file']['filename'],
-                interval=interval,
-                when=when,  # one file every {interval} Day
-                backupCount=backupCount,  # keep latest 30 files
-                encoding="utf-8")
-            self.time_rotate_hanlder.doRollover()
-            self.time_rotate_hanlder.setFormatter(formatter)
-            handlers.append(self.time_rotate_hanlder)
+            # self.time_rotate_hanlder = CustTimedRotatingFileHandler(
+            #     # housekeeping is delete file by this filename as prefix
+            #     filename=log_config['handlers']['file']['filename'],
+            #     interval=interval,
+            #     when=when,  # one file every {interval} Day
+            #     backupCount=backupCount,  # keep latest 30 files
+            #     encoding="utf-8")
+            # self.time_rotate_hanlder.doRollover()
+            # self.time_rotate_hanlder.setFormatter(formatter)
+            # handlers.append(self.time_rotate_hanlder)
 
         for h in handlers:
             lg.addHandler(h)

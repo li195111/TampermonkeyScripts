@@ -115,7 +115,7 @@ class Item(IBase):
   is_post_live_clips_media: bool
   deleted_reason: int
   integrity_review_decision: str
-  has_shared_to_fb: int
+  has_shared_to_fb: Optional[int] = None
   expiring_at: int
   is_unified_video: bool
   should_request_ads: bool

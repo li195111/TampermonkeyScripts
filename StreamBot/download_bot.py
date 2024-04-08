@@ -193,6 +193,8 @@ class URLDownloadBot(IURLDownloadBot):
                   r'FC2[\-]?[\_]?[ ]?PPV[\-]?[ ]?[0-9]?[0-9]?[0-9]?[0-9]?[0-9]?[0-9]?[0-9]?']
 
         for file_path in file_paths:
+            dir_name = '_'.join(file_path.stem.split('_')[:-2])
+            dir_name = dir_name.replace('{','\{').replace('}','\}').replace(')','\)').replace('(','\(').replace('[','\[').replace(']','\]')
             # SN
             matches = [re.findall(reg, file_path.stem) for reg in regexs]
             sn_code = None
@@ -203,7 +205,7 @@ class URLDownloadBot(IURLDownloadBot):
             if sn_code:
                 exists_file = self.handler.query_one({'SN': {'$regex': re.compile(rf"{sn_code}")}})
             else:
-                exists_file = self.handler.query_one({'dir_name': {'$regex': re.compile(rf"{file_path.stem}")}})
+                exists_file = self.handler.query_one({'dir_name': {'$regex': re.compile(rf"{dir_name}")}})
 
             if self.queue_size < self.max_queue and not exists_file:
                 # Add to queue

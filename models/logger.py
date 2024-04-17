@@ -4,11 +4,8 @@ logger object
 import logging
 import os
 import sys
-import threading
 from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path
-
-from concurrent_log_handler import ConcurrentRotatingFileHandler
 
 log_config = {
     "version": 1,
@@ -36,13 +33,6 @@ log_config = {
         "uvicorn.access": {"handlers": ["file"], "level": "INFO", "propagate": False},
     },
 }
-
-
-class CustTimedRotatingFileHandler(TimedRotatingFileHandler):
-
-    def doRollover(self):
-        with threading.Lock():
-            super().doRollover()
 
 
 class logger:
@@ -77,20 +67,18 @@ class logger:
             log_dir.mkdir(exist_ok=True)
             log_config['handlers']['file']['filename'] = log_dir.joinpath(
                 log_filename).as_posix()
-            handler = ConcurrentRotatingFileHandler(
-                log_dir.joinpath(log_filename), "a", 512*1024, backupCount)
-            handler.setFormatter(formatter)
 
-            # self.time_rotate_hanlder = CustTimedRotatingFileHandler(
-            #     # housekeeping is delete file by this filename as prefix
-            #     filename=log_config['handlers']['file']['filename'],
-            #     interval=interval,
-            #     when=when,  # one file every {interval} Day
-            #     backupCount=backupCount,  # keep latest 30 files
-            #     encoding="utf-8")
-            # self.time_rotate_hanlder.doRollover()
-            # self.time_rotate_hanlder.setFormatter(formatter)
-            # handlers.append(self.time_rotate_hanlder)
+            self.time_rotate_hanlder = TimedRotatingFileHandler(
+                # housekeeping is delete file by this filename as prefix
+                filename=log_config['handlers']['file']['filename'],
+                interval=interval,
+                when=when,  # one file every {interval} Day
+                backupCount=backupCount,  # keep latest 30 files
+                encoding="utf-8",
+                delay=True)
+            self.time_rotate_hanlder.doRollover()
+            self.time_rotate_hanlder.setFormatter(formatter)
+            handlers.append(self.time_rotate_hanlder)
 
         for h in handlers:
             lg.addHandler(h)

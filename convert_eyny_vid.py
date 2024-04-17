@@ -14,6 +14,7 @@ if __name__ == '__main__':
     file_path = Path(__file__)
     os.environ['LOG_DIR'] = file_path.parent.joinpath('logs').as_posix()
     log = logger(name=file_path.name,
+                 log_filename=f'ConvertEynyVideos.log',
                  level=10 if os.getenv("DEBUG") else 20)
 
     dst_dirs = [

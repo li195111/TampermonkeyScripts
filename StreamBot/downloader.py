@@ -207,11 +207,11 @@ class StreamDownloader(Log):
 
     def download_stream_file(self, url: URL, load_cache: bool = True):
         self.media = Stream(url, 3, self.chunk_size, self.progress_length, self.timeout,
-                            load_cache)
+                            load_cache, logger=self.logger)
         self.media.start()
         return self.media
 
     def download_retrieve(self, url: URL):
-        self.media = Media(url)
+        self.media = Media(url, logger=self.logger)
         self.media.start()
         return self.media

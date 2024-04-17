@@ -21,7 +21,7 @@ def parse_reels(user_name: str, headers):
     file_path = Path(__file__)
     proj_dir = file_path.parent
     os.environ['LOG_DIR'] = proj_dir.joinpath('logs').as_posix()
-    log = logger(name='ReelsDLR', level=10 if os.getenv("DEBUG") else 20)
+    log = logger(name='ReelsDLR', log_filename='ReelsDLR.log', level=10 if os.getenv("DEBUG") else 20)
 
     user_profile_dir = Path(os.environ['USERPROFILE'])
     # Get User Profile

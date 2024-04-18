@@ -25,7 +25,7 @@ class IURLDownloadBot(Log):
                  dst_dir: str,
                  max_queue: int = 5,
                  max_threads: int = 3) -> None:
-        super().__init__()
+        super().__init__(bot_type=bot_type)
         self.__type = bot_type
         self.__prefix = f'{self.type.value}_bot_'
         self.__src = src_dir

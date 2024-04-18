@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 from pydantic.fields import Field
 
@@ -41,26 +41,26 @@ class HDProfilePicURLInfo(IBase):
 
 class CaptionUser(IBase):
   fbid_v2: str
-  feed_post_reshare_disabled: bool
+  feed_post_reshare_disabled: Optional[bool] = None
   full_name: str
   id: int
   is_private: bool
-  is_unpublished: bool
+  is_unpublished: Optional[bool] = None
   pk: int
   pk_id: int
-  show_account_transparency_details: bool
+  show_account_transparency_details: Optional[bool] = None
   strong_id: str = Field(alias='strong_id__')
-  third_party_downloads_enabled: int
-  account_badges: List[Any]
-  fan_club_info: FanClubInfo
-  has_anonymous_profile_picture: bool
-  hd_profile_pic_url_info: HDProfilePicURLInfo
-  hd_profile_pic_versions: List[HDProfilePicURLInfo]
+  third_party_downloads_enabled: Optional[int] = None
+  account_badges: Optional[List[Any]] = None
+  fan_club_info: Optional[FanClubInfo] = None
+  has_anonymous_profile_picture: Optional[bool] = None
+  hd_profile_pic_url_info: Optional[HDProfilePicURLInfo] = None
+  hd_profile_pic_versions: Optional[List[HDProfilePicURLInfo]] = None
   is_favorite: Optional[bool] = None
   is_verified: bool
   profile_pic_id: Optional[str] = None
   profile_pic_url: str
-  transparency_product_enabled: bool
+  transparency_product_enabled: Optional[bool] = None
   username: str
   latest_reel_media: Optional[int] = None
 
@@ -74,8 +74,8 @@ class Caption(IBase):
   did_report_as_spam: bool
   created_at: int
   created_at_utc: int
-  content_type: ContentType
-  status: Status
+  content_type: str
+  status: str
   bit_flags: int
   share_enabled: bool
   is_ranked_comment: bool
@@ -389,8 +389,8 @@ class Comment(IBase):
   did_report_as_spam: bool
   created_at: int
   created_at_utc: int
-  content_type: ContentType
-  status: Status
+  content_type: str
+  status: str
   bit_flags: int
   share_enabled: bool
   is_ranked_comment: bool

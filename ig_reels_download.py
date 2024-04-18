@@ -10,6 +10,7 @@ from urllib.parse import urlparse
 import requests
 
 from models.ig_feed_user import FeedUser
+from models.ig_feed_user_v2 import FeedUserV2
 from models.ig_reels import InsReels
 from models.ig_reels_tray import ReelsTray
 from models.ig_user_profile import UserProfile

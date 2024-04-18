@@ -41,7 +41,8 @@ class IURLDownloadBot(Log):
         self.downloader = StreamDownloader(timeout=0.5,
                                            chunk_size=int(1024 * 1024 * 1),
                                            progress_length=self.progress_length,
-                                           max_connect=3)
+                                           max_connect=3,
+                                           logger=self.logger)
         self.file_manager_cols = list(QueueItem.__fields__.keys())
         self.max_threads = max_threads
         self.handler = MongoHandler()
@@ -240,7 +241,7 @@ class URLDownloadBot(IURLDownloadBot):
     def process_item(self, item: QueueItem):
         if item.state == FileState.QUEUE and os.path.exists(item.file_path):
             item.urls = URLs.from_file(item.file_path, self.prefix, item.media_type,
-                                       self.dst)
+                                       self.dst,logger=self.logger)
             if len(item.urls) == 0:
                 self.remove_queue.append(item)
             for url in item.urls:

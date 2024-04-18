@@ -76,8 +76,9 @@ class IURLs(Log):
                  media_name: str,
                  media_type: MediaType,
                  urls: Union[str, List[str]],
-                 dst_dir: str = '.') -> None:
-        super().__init__()
+                 dst_dir: str = '.',
+                 **kwargs) -> None:
+        super().__init__(**kwargs)
         self.__prefix = prefix
         self.__media_name = media_name
         self.__media_type = media_type
@@ -159,7 +160,8 @@ class IURLs(Log):
                   file_path: str,
                   prefix: str,
                   media_type: MediaType,
-                  dst_dir='.'):
+                  dst_dir='.',
+                  **kwargs):
         # Get Media Infos
         # Eyny: 'eyny_bot_[繁體中文]_[合集] [AT-X] [無修正] [無刪減]_20221014_vid_ee9686596d9b57d26ccfa227f590fca9.mp4.txt'
         # IG: 'ig_bot_wendy__624_20221014_imgs_p_Carl3ODPoKK.txt'
@@ -187,7 +189,7 @@ class IURLs(Log):
         with open(file_path, 'r', encoding='utf-8') as fp:
             urls = fp.read()
 
-        return cls(prefix, media_name, media_type, urls, dst_dir)
+        return cls(prefix, media_name, media_type, urls, dst_dir,**kwargs)
 
 
 class URLs(IURLs):
@@ -197,16 +199,18 @@ class URLs(IURLs):
                  media_name: str,
                  media_type: MediaType,
                  urls: Union[str, List[str]],
-                 dst_dir: str = '.') -> None:
-        super().__init__(prefix, media_name, media_type, urls, dst_dir)
+                 dst_dir: str = '.',
+                 **kwargs) -> None:
+        super().__init__(prefix, media_name, media_type, urls, dst_dir,**kwargs)
 
     @classmethod
     def from_file(cls,
                   file_path: str,
                   bot_prefix: str,
                   media_type: MediaType,
-                  dst_dir: str = '.') -> URLs:
-        return super().from_file(file_path, bot_prefix, media_type, dst_dir)
+                  dst_dir: str = '.',
+                  **kwargs) -> URLs:
+        return super().from_file(file_path, bot_prefix, media_type, dst_dir,**kwargs)
 
 
 class IStream(LogThread):

@@ -16,7 +16,11 @@ from models.ig_user_profile import UserProfile
 from models.logger import logger
 from StreamBot import MediaType
 
+'https://scontent.cdninstagram.com/o1/v/t16/f1/m78/E64C45E092150B48564A6127B0DB5494_video_dashinit.mp4?efg=eyJxZV9ncm91cHMiOiJbXCJpZ193ZWJfZGVsaXZlcnlfdnRzX290ZlwiXSIsInZlbmNvZGVfdGFnIjoidnRzX3ZvZF91cmxnZW4uc3RvcnkuYzIuNzIwLmJhc2VsaW5lIn0&_nc_ht=scontent.cdninstagram.com&_nc_cat=102&vs=25792572827000404_598503070&_nc_vs=HBksFQIYUWlnX3hwdl9wbGFjZW1lbnRfcGVybWFuZW50X3YyL0U2NEM0NUUwOTIxNTBCNDg1NjRBNjEyN0IwREI1NDk0X3ZpZGVvX2Rhc2hpbml0Lm1wNBUAAsgBABUCGDpwYXNzdGhyb3VnaF9ldmVyc3RvcmUvR0NQVW9BTDhCTkJoLUVnSUFNa21mdnc3d25ZeGJwUjFBQUFGFQICyAEAKAAYABsBiAd1c2Vfb2lsATEVAAAm8K787qyQtT8VAigCQzMsF0AJU\u00252FfO2RaHGBJkYXNoX2Jhc2VsaW5lXzFfdjERAHXoBwA\u00253D&_nc_rid=35a97dcc8c&ccb=9-4&oh=00_AfCLEbpo8_DE97Gn1giTgg_UNeNQ-WTAKV9BADg2VALErQ&oe=662C0290&_nc_sid=10d13b'
+'https://scontent.cdninstagram.com/v/t51.29350-15/440656225_949972736615440_7573897684140411047_n.jpg?stp=dst-jpg_e15&efg=eyJ2ZW5jb2RlX3RhZyI6ImltYWdlX3VybGdlbi42NDB4MTEzNi5zZHIuZjI5MzUwIn0&_nc_ht=scontent.cdninstagram.com&_nc_cat=104&_nc_ohc=xlyrO9MMuNwQ7kNvgHcQb4W&edm=APs17CUBAAAA&ccb=7-5&ig_cache_key=MzM1Mzg3NzY2OTMwMDc1MDM4MQ\u00253D\u00253D.2-ccb7-5&oh=00_AfCjBSvGqrUKj9C3Jfls1hcjWpoCM_Za8fxp9XC9FlR94Q&oe=662BF5AC&_nc_sid=10d13b'
 
+'https://www.instagram.com/stories/freyaachuang/3353877669300750381/' # 302
+'https://www.instagram.com/stories/freyaachuang/3353877669300750381/?r=1' # 200
 def parse_reels(user_name: str, headers):
     file_path = Path(__file__)
     proj_dir = file_path.parent

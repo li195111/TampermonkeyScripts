@@ -70,6 +70,13 @@ class MongoHandler(IHandler):
         col = self.get_collection(collection, sys)
         return col.find_one(query, projection)
 
+    def aggregate(self, pipeline: List[dict], show_id: bool = False, collection: Optional[str] = None, sys: bool = False, **kwargs):
+        projection = self.get_projection(None, show_id)
+        pipeline += [{'$project': projection}]
+        print('Collection: ', collection)
+        col = self.get_collection(collection, sys)
+        return col.aggregate(pipeline, **kwargs)
+
     def update(self, query: dict, update: Union[dict, List[dict]], collection: Optional[str] = None, sys: bool = False):
         '''If data is list, update_many, else update_one'''
         col = self.get_collection(collection, sys)

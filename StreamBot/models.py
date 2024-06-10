@@ -9,7 +9,7 @@ from urllib.parse import urlparse
 from models.base import IBase, Log, LogThread
 
 from .enums import FileSizeLevel, FileState, MediaType
-from .utils import count_bytes_level
+from .utils import count_bytes_level, error_msg
 
 
 class ErrorMsg(IBase):
@@ -316,8 +316,9 @@ class IStream(LogThread):
                 if os.path.exists(old_cache_path):
                     try:
                         os.remove(old_cache_path)
-                    except FileNotFoundError:
-                        pass
+                    except Exception as err:
+                        error = Error(message={"result": error_msg(err)})
+                        self.logger.warning(error)
             self.is_leave = pass_exists
             if pass_exists:
                 self.complete()

@@ -21,6 +21,15 @@ from StreamBot import MediaType
 
 'https://www.instagram.com/stories/freyaachuang/3353877669300750381/' # 302
 'https://www.instagram.com/stories/freyaachuang/3353877669300750381/?r=1' # 200
+
+# 2024/06/26 Update
+# https://scontent.cdninstagram.com/o1/v/t16/f1/m78/124A27C2C651511BAEEAA04A0360B589_video_dashinit.mp4?efg=eyJ2aWRlb19pZCI6bnVsbCwidmVuY29kZV90YWciOiJpZy14cHZkcy5zdG9yeS5jMi1DMy5kYXNoX2Jhc2VsaW5lXzFfdjEifQ&_nc_ht=scontent.cdninstagram.com&_nc_cat=102&ccb=9-4&oh=00_AYAVHEdfqTIjW8TLGGzPKhkJTCcOQ0j4liO0LtwCVu32ZQ&oe=667D3C7A&_nc_sid=9ca052&bytestart=0
+# https://scontent.cdninstagram.com/v/t66.30100-16/46638189_1149217949689833_8365826383080174344_n.mp4?_nc_cat=100&ccb=1-7&_nc_sid=9a5d50&efg=eyJ2ZW5jb2RlX3RhZyI6ImlnLXhwdmRzLnN0b3J5LmMyLUMzLmRhc2hfYmFzZWxpbmVfMTA4MHBfdjEiLCJ2aWRlb19pZCI6bnVsbH0=&_nc_ohc=HQaoAbWip1oQ7kNvgE0EfVo&_nc_ht=scontent.cdninstagram.com&oh=00_AYAD9N_XDspduo4EX5WbkLwGYnONJjxF7llflkL__mtFTQ&oe=668147A3&bytestart=0
+# Small Video
+# https://scontent.cdninstagram.com/o1/v/t16/f1/m78/5E41B9EA12A6B27DCEB341F4556ECD86_video_dashinit.mp4?efg=eyJ2aWRlb19pZCI6bnVsbCwidmVuY29kZV90YWciOiJpZy14cHZkcy5zdG9yeS5jMi1DMy5kYXNoX2Jhc2VsaW5lXzNfdjEifQ&_nc_ht=scontent.cdninstagram.com&_nc_cat=105&ccb=9-4&oh=00_AYDPELPwsvXtnyK1X-7-ausMqA4oQpTApXj2APUFiQ7Lcg&oe=667D375C&_nc_sid=9ca052&bytestart=0
+# Large Video
+# https://scontent.cdninstagram.com/o1/v/t16/f1/m78/904687046B5AA97BC75C6CBD67BEA8B2_video_dashinit.mp4?efg=eyJ2aWRlb19pZCI6bnVsbCwidmVuY29kZV90YWciOiJpZy14cHZkcy5zdG9yeS5jMi1DMy5kYXNoX2Jhc2VsaW5lXzFfdjEifQ&_nc_ht=scontent.cdninstagram.com&_nc_cat=111&ccb=9-4&oh=00_AYAmo3Rf06x6vYUI7kqNRS64IW1hH38VaSfz2xvGM1m05A&oe=667D5C4F&_nc_sid=9ca052&bytestart=0
+
 def parse_reels(user_name: str, headers):
     file_path = Path(__file__)
     proj_dir = file_path.parent

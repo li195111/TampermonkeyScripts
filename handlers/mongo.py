@@ -36,6 +36,10 @@ class MongoHandler(IHandler):
             collection = self.default_col if not sys else self.default_sys_col
         return self.db.get_collection(collection)
 
+    def count_documents(self, filter: Optional[dict] = None, collection: Optional[str] = None, sys: bool = False, **kwargs):
+        col = self.get_collection(collection, sys)
+        return col.count_documents(filter)
+
     def insert(self, data: Union[dict, List[dict]], collection: Optional[str] = None, sys: bool = False):
         '''If data is list, insert_many, else insert_one'''
         insert_count = 0
@@ -58,33 +62,32 @@ class MongoHandler(IHandler):
             projection.update({'_id': 1})
         return projection
 
-    def query(self, query: dict, projection: Optional[dict] = None, show_id: bool = False, collection: Optional[str] = None, sys: bool = False):
+    def query(self, query: dict, projection: Optional[dict] = None, show_id: bool = False, collection: Optional[str] = None, sys: bool = False, **kwargs):
         '''If projection is None, show_id is False, return all fields except _id'''
         projection = self.get_projection(projection, show_id)
         col = self.get_collection(collection, sys)
-        return col.find(query, projection)
+        return col.find(query, projection, **kwargs)
 
-    def query_one(self, query: dict, projection: Optional[dict] = None, show_id: bool = False, collection: Optional[str] = None, sys: bool = False):
+    def query_one(self, query: dict, projection: Optional[dict] = None, show_id: bool = False, collection: Optional[str] = None, sys: bool = False, **kwargs):
         '''If projection is None, show_id is False, return all fields except _id'''
         projection = self.get_projection(projection, show_id)
         col = self.get_collection(collection, sys)
-        return col.find_one(query, projection)
+        return col.find_one(query, projection, **kwargs)
 
     def aggregate(self, pipeline: List[dict], show_id: bool = False, collection: Optional[str] = None, sys: bool = False, **kwargs):
         projection = self.get_projection(None, show_id)
         pipeline += [{'$project': projection}]
-        print('Collection: ', collection)
         col = self.get_collection(collection, sys)
         return col.aggregate(pipeline, **kwargs)
 
-    def update(self, query: dict, update: Union[dict, List[dict]], collection: Optional[str] = None, sys: bool = False):
+    def update(self, query: dict, update: Union[dict, List[dict]], collection: Optional[str] = None, sys: bool = False, **kwargs):
         '''If data is list, update_many, else update_one'''
         col = self.get_collection(collection, sys)
-        result = col.update_many(query, update)
+        result = col.update_many(query, update, **kwargs)
         return result.modified_count
 
-    def delete(self, query: dict, collection: Optional[str] = None, sys: bool = False):
+    def delete(self, query: dict, collection: Optional[str] = None, sys: bool = False, **kwargs):
         '''Delete all matched documents, return deleted count'''
         col = self.get_collection(collection, sys)
-        result = col.delete_many(query)
+        result = col.delete_many(query, **kwargs)
         return result.deleted_count

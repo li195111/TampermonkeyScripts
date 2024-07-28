@@ -1,6 +1,6 @@
 # Define the folder path where you want to search for files
-$folderPath = $pwd
-
+$folderPath = (Get-Item $PSScriptRoot).parent
+Write-Host "Searching for files in $folderPath"
 # Recursively search for files with the specified extensions
 $files = Get-ChildItem -Path $folderPath -File -Recurse
 

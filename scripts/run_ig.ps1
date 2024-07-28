@@ -1,2 +1,7 @@
-$conda='C:\Users\a0983\miniconda3\shell\condabin\conda-hook.ps1'
-wt powershell -noexit -command "& {& $conda\;conda activate scraper\;python $PSScriptRoot\..\ig_url_download.py}"
+conda activate download
+Write-Host "Start download"
+python $PSScriptRoot/../ig_url_download.py
+Write-Host "Finish download"
+Write-Host "Start Update Database"
+python $PSScriptRoot/../ig.py
+Write-Host "Finish Update Database"

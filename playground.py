@@ -1,5 +1,4 @@
 import os
-import re
 import sys
 import uuid
 from datetime import datetime
@@ -11,6 +10,7 @@ from dotenv import load_dotenv
 from pydantic import BaseModel
 
 from handlers.mongo import MongoHandler
+from utils.mongo_op import search_string_to_mongodb_pipeline
 
 
 class History(BaseModel):
@@ -32,7 +32,8 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         search = sys.argv[1]
     else:
-        histories = list(h.query({'doc_type': 'query_history'}, {'query': 1, '_id': 0}))
+        histories = list(
+            h.query({'doc_type': 'query_history'}, {'query': 1, '_id': 0}))
         histories = list(set([h['query'] for h in histories]))
         print('Search History:')
         for idx, history in enumerate(histories):
@@ -43,13 +44,14 @@ if __name__ == '__main__':
             sys.exit(0)
         if search.isdigit():
             search = histories[int(search) - 1]
-    if search in ['|',',','&']:
+    if search in ['|', ',', '&']:
         print('Invalid Search Query.')
         sys.exit(0)
     h.insert(History(query=search, username='admin').dict())
-    search = ','.join(search.split('|'))
-    searchs = search.split(',')
-    search_agg = {'$or': [{'title': {'$regex': re.compile(rf"{s}")}} for s in searchs]}
+
+    search_agg = search_string_to_mongodb_pipeline(search)
+    print('Search Match query: ', search_agg)
+
     agg = [{'$match': search_agg},
            {'$project': {'_id': 0}},
            {'$sort': {'snap_date': 1}},
@@ -68,6 +70,10 @@ if __name__ == '__main__':
                 if video['type'] == '.mkv':
                     video_name = f"{video['name']}{video['type']}"
                     if video_dir_path:
-                        print(f'start "{video_dir_path.joinpath(dir_name)}"')
+                        av_dir_path = video_dir_path.joinpath(dir_name)
+                        av_dir_exists = av_dir_path.exists()
+                        if not av_dir_exists:
+                            print(f"Not Exists: {dir_name}")
+                        else:
+                            print(f'Start-Process "{video_dir_path.joinpath(dir_name)}"')
     print(f'Finished AV Time Cost: {datetime.now() - st}')
-    print(search_agg)

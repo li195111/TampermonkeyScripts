@@ -78,10 +78,11 @@ if __name__ == '__main__':
         dir_path = cache_path.parent
         vid_path = cache_path
         mkv_path = dir_path.joinpath(vid_path.name.replace('mp4', 'mkv'))
-        proc.set_description(f'Process: {cache_path.parent.name}')
-        # print('\tMKV Path: %s', mkv_path.exists())
-        # print('\tMP4 Path: %s', vid_path.exists())
+        # proc.set_description(f'Process: {cache_path.parent.name}')
         if vid_path.exists() and not mkv_path.exists():
+            print(f'Process: {cache_path.parent}')
+            if os.stat(vid_path).st_size == 0:
+                shutil.rmtree(dir_path)
             # Convert mp4 to mkv
             cmd = f'avidemux_cli.exe --load "{vid_path}" --output-format MKV --save "{mkv_path}"'
             try:

@@ -7,4 +7,5 @@ python $PSScriptRoot/../av.py
 Write-Host "Finish Update Database"
 Write-Host "Start Housekeep"
 python $PSScriptRoot/../housekeep_video.py
+python $PSScriptRoot/../cleanup_dup.py
 Write-Host "Finish Housekeep"

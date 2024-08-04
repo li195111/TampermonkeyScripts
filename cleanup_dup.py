@@ -93,3 +93,31 @@ if __name__ == '__main__':
             except sp.CalledProcessError as e:
                 log.warning('Remove Error File: %s', dir_path)
                 shutil.rmtree(dir_path)
+
+    # 刪除重複的影片(有.mkv)
+    old_dst_path = Path(os.getenv('OLD_EYNY_DOWNLOAD_DST_PATH'))
+    dst_path = Path(os.getenv('EYNY_DOWNLOAD_DST_PATH'))
+
+    old_dst_files = list(handler.aggregate(
+        [{'$match': {'parent': "Study_old"}}], show_id=True))
+
+    proc = tqdm(old_dst_files, desc='Remove Old Files', unit='file')
+    for old_file in proc:
+        dst_files = list(handler.aggregate([{'$match': {'parent': "Study",
+                                                        'dir_name': old_file['dir_name']
+                                                        }}], show_id=True))
+        for dst_file in dst_files:
+            if not 'videos' in dst_file:
+                dst_dir_path = dst_path.joinpath(dst_file["dir_name"])
+                if len(list(dst_dir_path.rglob('*.mkv'))) == 0:
+                    proc.set_description(f"Remove Empty: {dst_file['_id']}")
+                    if dir_path.exists():
+                        shutil.rmtree(dir_path)
+                    handler.delete({'_id': dst_file['_id']})
+            else:
+                # Remove old dup file
+                old_dst_dir_path = old_dst_path.joinpath(old_file["dir_name"])
+                proc.set_description(f'Remove: {old_file["dir_name"]}')
+                if old_dst_dir_path.exists():
+                    shutil.rmtree(old_dst_dir_path)
+                handler.delete({'_id': old_file['_id']})

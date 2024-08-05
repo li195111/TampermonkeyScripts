@@ -4,12 +4,11 @@ import subprocess as sp
 from pathlib import Path
 from typing import List
 
-from tqdm import tqdm
 from dotenv import load_dotenv
+from tqdm import tqdm
 
-from models.logger import logger
 from handlers.mongo import MongoHandler
-
+from models.logger import logger
 
 if __name__ == '__main__':
     load_dotenv()
@@ -18,10 +17,10 @@ if __name__ == '__main__':
     log = logger(name=file_path.name,
                  log_filename=f'CleanupDup.log',
                  level=10 if os.getenv("DEBUG") else 20)
-    dst_dirs = [
-        Path(os.getenv('EYNY_DOWNLOAD_DST_PATH')),
-        Path(os.getenv('OLD_EYNY_DOWNLOAD_DST_PATH')),
-    ]
+
+    dst_path = Path(os.getenv('EYNY_DOWNLOAD_DST_PATH'))
+    old_dst_path = Path(os.getenv('OLD_EYNY_DOWNLOAD_DST_PATH'))
+    dst_dirs = [dst_path, old_dst_path]
 
     handler = MongoHandler()
 
@@ -95,9 +94,6 @@ if __name__ == '__main__':
                 shutil.rmtree(dir_path)
 
     # 刪除重複的影片(有.mkv)
-    old_dst_path = Path(os.getenv('OLD_EYNY_DOWNLOAD_DST_PATH'))
-    dst_path = Path(os.getenv('EYNY_DOWNLOAD_DST_PATH'))
-
     old_dst_files = list(handler.aggregate(
         [{'$match': {'parent': "Study_old"}}], show_id=True))
 
@@ -109,8 +105,8 @@ if __name__ == '__main__':
         if len(dst_files) > 0:
             for dst_file in dst_files:
                 if not 'videos' in dst_file:
-                    dst_dir_path = dst_path.joinpath(dst_file["dir_name"])
-                    if len(list(dst_dir_path.rglob('*.mkv'))) == 0:
+                    dst_path = dst_path.joinpath(dst_file["dir_name"])
+                    if len(list(dst_path.rglob('*.mkv'))) == 0:
                         proc.set_description(
                             f"Remove Empty: {dst_file['_id']}")
                         if dir_path.exists():
@@ -118,19 +114,19 @@ if __name__ == '__main__':
                         handler.delete({'_id': dst_file['_id']})
                 else:
                     # Remove old dup file
-                    old_dst_dir_path = old_dst_path.joinpath(
+                    old_dst_path = old_dst_path.joinpath(
                         old_file["dir_name"])
                     proc.set_description(f'Remove: {old_file["dir_name"]}')
-                    if old_dst_dir_path.exists():
-                        shutil.rmtree(old_dst_dir_path)
+                    if old_dst_path.exists():
+                        shutil.rmtree(old_dst_path)
                     handler.delete({'_id': old_file['_id']})
         else:
             # Move old file to new folder
-            old_dst_dir_path = old_dst_path.joinpath(old_file["dir_name"])
-            if old_dst_dir_path.exists():
-                dst_dir_path = dst_path.joinpath(old_file["dir_name"])
+            old_dst_path = old_dst_path.joinpath(old_file["dir_name"])
+            if old_dst_path.exists():
+                dst_path = dst_path.joinpath(old_file["dir_name"])
                 proc.set_description(f'Move: {old_file["dir_name"]}')
-                shutil.move(old_dst_dir_path, dst_dir_path)
+                shutil.move(old_dst_path, dst_path)
             else:
                 # Remove old not exists file
                 handler.delete({'_id': old_file['_id']})

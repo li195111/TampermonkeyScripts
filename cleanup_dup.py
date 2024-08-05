@@ -106,18 +106,31 @@ if __name__ == '__main__':
         dst_files = list(handler.aggregate([{'$match': {'parent': "Study",
                                                         'dir_name': old_file['dir_name']
                                                         }}], show_id=True))
-        for dst_file in dst_files:
-            if not 'videos' in dst_file:
-                dst_dir_path = dst_path.joinpath(dst_file["dir_name"])
-                if len(list(dst_dir_path.rglob('*.mkv'))) == 0:
-                    proc.set_description(f"Remove Empty: {dst_file['_id']}")
-                    if dir_path.exists():
-                        shutil.rmtree(dir_path)
-                    handler.delete({'_id': dst_file['_id']})
+        if len(dst_files) > 0:
+            for dst_file in dst_files:
+                if not 'videos' in dst_file:
+                    dst_dir_path = dst_path.joinpath(dst_file["dir_name"])
+                    if len(list(dst_dir_path.rglob('*.mkv'))) == 0:
+                        proc.set_description(
+                            f"Remove Empty: {dst_file['_id']}")
+                        if dir_path.exists():
+                            shutil.rmtree(dir_path)
+                        handler.delete({'_id': dst_file['_id']})
+                else:
+                    # Remove old dup file
+                    old_dst_dir_path = old_dst_path.joinpath(
+                        old_file["dir_name"])
+                    proc.set_description(f'Remove: {old_file["dir_name"]}')
+                    if old_dst_dir_path.exists():
+                        shutil.rmtree(old_dst_dir_path)
+                    handler.delete({'_id': old_file['_id']})
+        else:
+            # Move old file to new folder
+            old_dst_dir_path = old_dst_path.joinpath(old_file["dir_name"])
+            if old_dst_dir_path.exists():
+                dst_dir_path = dst_path.joinpath(old_file["dir_name"])
+                proc.set_description(f'Move: {old_file["dir_name"]}')
+                shutil.move(old_dst_dir_path, dst_dir_path)
             else:
-                # Remove old dup file
-                old_dst_dir_path = old_dst_path.joinpath(old_file["dir_name"])
-                proc.set_description(f'Remove: {old_file["dir_name"]}')
-                if old_dst_dir_path.exists():
-                    shutil.rmtree(old_dst_dir_path)
+                # Remove old not exists file
                 handler.delete({'_id': old_file['_id']})

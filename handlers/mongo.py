@@ -75,8 +75,9 @@ class MongoHandler(IHandler):
         return col.find_one(query, projection, **kwargs)
 
     def aggregate(self, pipeline: List[dict], show_id: bool = False, collection: Optional[str] = None, sys: bool = False, **kwargs):
-        projection = self.get_projection(None, show_id)
-        pipeline += [{'$project': projection}]
+        if not show_id:
+            projection = self.get_projection(None, show_id)
+            pipeline += [{'$project': projection}]
         col = self.get_collection(collection, sys)
         return col.aggregate(pipeline, **kwargs)
 

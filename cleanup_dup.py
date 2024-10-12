@@ -16,12 +16,12 @@ if __name__ == '__main__':
     file_path = Path(__file__)
     os.environ['LOG_DIR'] = file_path.parent.joinpath('logs').as_posix()
     log = logger(name=file_path.name,
-                 log_filename=f'HouseKeepVideos.log',
+                 log_filename=f'CleanupDup.log',
                  level=10 if os.getenv("DEBUG") else 20)
-    dst_dirs = [
-        Path(os.getenv('EYNY_DOWNLOAD_DST_PATH')),
-        Path(os.getenv('OLD_EYNY_DOWNLOAD_DST_PATH')),
-    ]
+
+    dst_path = Path(os.getenv('EYNY_DOWNLOAD_DST_PATH'))
+    old_dst_path = Path(os.getenv('OLD_EYNY_DOWNLOAD_DST_PATH'))
+    dst_dirs = [dst_path, old_dst_path]
 
     handler = MongoHandler()
 
@@ -51,7 +51,8 @@ if __name__ == '__main__':
     log.info("Number of MP4: %s, Remove: %s", len(mp4_files), remove_count)
 
     # 刪除無影片的資料夾
-    empty_files = list(handler.aggregate([{'$match': {"doc_type":"av_info", 'videos': {'$size': 0}}}], show_id=True))
+    empty_files = list(handler.aggregate(
+        [{'$match': {"doc_type": "av_info", 'videos': {'$size': 0}}}], show_id=True))
     remove_count = 0
     for file in tqdm(empty_files, desc="Remove Empty"):
         dst_dir = [dst for dst in dst_dirs if dst.name == file['parent']]
@@ -72,27 +73,61 @@ if __name__ == '__main__':
             incomplete_vids.extend(list(dst_dir.rglob('*.mp4')))
     log.info('Total Incomplete: %s', len(incomplete_vids))
 
-    for cache_path in incomplete_vids:
+    proc = tqdm(incomplete_vids, desc='Process Incomplete Videos', unit='file')
+    for cache_path in proc:
         dir_path = cache_path.parent
         vid_path = cache_path
         mkv_path = dir_path.joinpath(vid_path.name.replace('mp4', 'mkv'))
-        print('Process: %s', cache_path.parent)
-        print('\tMKV Path: %s', mkv_path.exists())
-        print('\tMP4 Path: %s', vid_path.exists())
+        # proc.set_description(f'Process: {cache_path.parent.name}')
         if vid_path.exists() and not mkv_path.exists():
+            print(f'Process: {cache_path.parent}')
+            if os.stat(vid_path).st_size == 0:
+                shutil.rmtree(dir_path)
             # Convert mp4 to mkv
             cmd = f'avidemux_cli.exe --load "{vid_path}" --output-format MKV --save "{mkv_path}"'
-            out = sp.check_output(cmd,
-                                  shell=True,
-                                  cwd=os.getenv('AVIDEMUX_CLI_PATH'),
-                                  stderr=sp.STDOUT)
-            
-        #     try:
-        #         is_error = ('Error' in out.decode())
-        #     except UnicodeDecodeError:
-        #         is_error = ('Error' in out)
-        #     if is_error:
-        #         log.warning('Remove Error File: %s', dir_path)
-        #         shutil.rmtree(dir_path.as_posix())
-        # else:
-        #     ...
+            try:
+                out = sp.check_output(cmd,
+                                      shell=True,
+                                      cwd=os.getenv('AVIDEMUX_CLI_PATH'),
+                                      stderr=sp.STDOUT)
+            except sp.CalledProcessError as e:
+                log.warning('Remove Error File: %s', dir_path)
+                shutil.rmtree(dir_path)
+
+    # 刪除重複的影片(有.mkv)
+    old_dst_files = list(handler.aggregate(
+        [{'$match': {'parent': "Study_old"}}], show_id=True))
+
+    proc = tqdm(old_dst_files, desc='Remove Old Files', unit='file')
+    for old_file in proc:
+        dst_files = list(handler.aggregate([{'$match': {'parent': "Study",
+                                                        'dir_name': old_file['dir_name']
+                                                        }}], show_id=True))
+        if len(dst_files) > 0:
+            for dst_file in dst_files:
+                if not 'videos' in dst_file:
+                    dst_path = dst_path.joinpath(dst_file["dir_name"])
+                    if len(list(dst_path.rglob('*.mkv'))) == 0:
+                        proc.set_description(
+                            f"Remove Empty: {dst_file['_id']}")
+                        if dir_path.exists():
+                            shutil.rmtree(dir_path)
+                        handler.delete({'_id': dst_file['_id']})
+                else:
+                    # Remove old dup file
+                    old_dst_path = old_dst_path.joinpath(
+                        old_file["dir_name"])
+                    proc.set_description(f'Remove: {old_file["dir_name"]}')
+                    if old_dst_path.exists():
+                        shutil.rmtree(old_dst_path)
+                    handler.delete({'_id': old_file['_id']})
+        else:
+            # Move old file to new folder
+            old_dst_path = old_dst_path.joinpath(old_file["dir_name"])
+            if old_dst_path.exists():
+                dst_path = dst_path.joinpath(old_file["dir_name"])
+                proc.set_description(f'Move: {old_file["dir_name"]}')
+                shutil.move(old_dst_path, dst_path)
+            else:
+                # Remove old not exists file
+                handler.delete({'_id': old_file['_id']})

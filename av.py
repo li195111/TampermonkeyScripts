@@ -128,7 +128,8 @@ if __name__ == '__main__':
             # log.info(f'obj size: {len(doc)}\n{doc}')
             # To Document Obj
             if doc.get('dir_name') != dir_name:
-                log.info(f'Update At dir_name: {doc.get("dir_name")}, {dir_name}')
+                log.info(
+                    f'Update At dir_name: {doc.get("dir_name")}, {dir_name}')
                 doc['dir_name'] = dir_name
                 update = True
 
@@ -150,7 +151,8 @@ if __name__ == '__main__':
 
             if exists_vids and vid_names:
                 if exists_vid_names != vid_names:
-                    log.info(f'Update At videos: {exists_vid_names} {vid_names}')
+                    log.info(
+                        f'Update At videos: {exists_vid_names} {vid_names}')
                     doc['videos'] = exists_vids + vids
                     update = True
                 else:
@@ -211,11 +213,10 @@ if __name__ == '__main__':
     update_count = 0
     inserted_count = 0
     if sys_doc:
-        update_count = h.update({'snap_date': snap_date}, {
-                                '$set': {'n_videos': n_docs}}, sys=True)
+        update_count = h.update({'snap_date': snap_date},
+                                {'$set': {'n_videos': n_docs}}, sys=True)
     else:
-        inserted_count = h.insert(
-            [{'n_videos': n_docs, 'snap_date': snap_date}], sys=True)
+        inserted_count = h.insert([{'n_videos': n_docs, 'snap_date': snap_date}], sys=True)
     log.info(f'Update {update_count} documents from {h.default_sys_col}')
     log.info(f'Insert {inserted_count} documents to {h.default_sys_col}')
 

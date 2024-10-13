@@ -75,8 +75,8 @@ class MongoHandler(IHandler):
         return col.find_one(query, projection, **kwargs)
 
     def aggregate(self, pipeline: List[dict], show_id: bool = False, collection: Optional[str] = None, sys: bool = False, **kwargs):
-        if not show_id:
-            projection = self.get_projection(None, show_id)
+        projection = self.get_projection(None, show_id)
+        if projection:
             pipeline += [{'$project': projection}]
         col = self.get_collection(collection, sys)
         return col.aggregate(pipeline, **kwargs)
@@ -85,6 +85,12 @@ class MongoHandler(IHandler):
         '''If data is list, update_many, else update_one'''
         col = self.get_collection(collection, sys)
         result = col.update_many(query, update, **kwargs)
+        return result.modified_count
+
+    def update_one(self, query: dict, update: dict, collection: Optional[str] = None, sys: bool = False, **kwargs):
+        '''Update one matched document, return modified count'''
+        col = self.get_collection(collection, sys)
+        result = col.update_one(query, update, **kwargs)
         return result.modified_count
 
     def delete(self, query: dict, collection: Optional[str] = None, sys: bool = False, **kwargs):

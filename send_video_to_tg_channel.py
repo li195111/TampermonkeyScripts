@@ -1,7 +1,7 @@
 import asyncio
 import os
-import sys
 from datetime import datetime
+from logging import Logger
 from pathlib import Path
 from typing import List, Optional
 
@@ -11,9 +11,11 @@ from pydantic import Field
 from telegram import Bot, InputFile
 from telegram.error import NetworkError, RetryAfter, TimedOut
 from telegram.request import HTTPXRequest
+from tqdm import tqdm
 
 from handlers.mongo import MongoHandler
 from models.base import IBase
+from models.logger import logger
 from StreamBot.utils import error_msg
 
 
@@ -52,6 +54,7 @@ class MongoDoc(IBase):
     tags: List[str] = []
     SN: Optional[str] | None = None
     tg_backup: Optional[List[BackupInfoTimeStamp]] = []
+    on_local: Optional[bool] = True
 
     class Config:
         populate_by_name = True
@@ -59,7 +62,12 @@ class MongoDoc(IBase):
         arbitrary_types_allowed = True
 
 
-async def send_mkv_video(bot_token: str, chat_id: str, video_path: str | Path, sn: str):
+async def send_mkv_video(bot_token: str, chat_id: str, video_path: str | Path, sn: str, log: Optional[Logger] = None):
+    if not log:
+        log = print
+    else:
+        log = log.debug
+
     bot_api_url = "https://api.telegram.org/bot"
     local_bot_api_url = 'http://localhost:8089/bot'
     # 使用自定義的 base_url 創建 Bot 實例
@@ -80,7 +88,7 @@ async def send_mkv_video(bot_token: str, chat_id: str, video_path: str | Path, s
 
     try:
         title = file_path.parent.name[5:]
-        print(f"上傳至 Channel: {chat_id} ...")
+        log(f"上傳至 Channel: {chat_id} ...")
         st = datetime.now()
         with open(file_path, 'rb') as fp:
             fp.seek(0)
@@ -95,7 +103,7 @@ async def send_mkv_video(bot_token: str, chat_id: str, video_path: str | Path, s
                 supports_streaming=True,
             )
         et = datetime.now()
-        print(f"\n上傳成功！ 費時: {et - st}")
+        log(f"\n上傳成功！ 費時: {et - st}")
         backup_info = {'bot_id': str(bot.id),
                        'chat_id': str(chat_id),
                        'message_id': str(video_message.id),
@@ -103,18 +111,25 @@ async def send_mkv_video(bot_token: str, chat_id: str, video_path: str | Path, s
                        }
         return BackupInfoTimeStamp(**backup_info)
     except TimedOut:
-        print("\n上傳超時。可能需要更長的 timeout 時間或更好的網絡連接。")
+        log("\n上傳超時。可能需要更長的 timeout 時間或更好的網絡連接。")
     except RetryAfter as e:
-        print(f"\n超過速率限制。建議等待 {e.retry_after} 秒後重試。")
+        log(f"\n超過速率限制。建議等待 {e.retry_after} 秒後重試。")
     except NetworkError as e:
-        print(f"\n網絡錯誤：{e}. 請檢查你的網絡連接和本地 Bot API 服務器狀態。")
+        log(f"\n網絡錯誤：{e}. 請檢查你的網絡連接和本地 Bot API 服務器狀態。")
     except KeyboardInterrupt:
-        print("\n用戶中斷了程序。")
+        log("\n用戶中斷了程序。")
     except Exception as e:
-        print(f"\n上傳視頻時發生錯誤: {type(e).__name__}: {e}")
+        log(f"\n上傳視頻時發生錯誤: {type(e).__name__}: {e}")
 
 if __name__ == "__main__":
     load_dotenv()
+
+    file_path = Path(__file__)
+    os.environ['LOG_DIR'] = file_path.parent.joinpath('logs').as_posix()
+    log = logger(name=file_path.name,
+                 log_filename=f'TGBackup.log',
+                 level=10 if os.getenv("DEBUG") else 20)
+
     bot_token = os.getenv('TG_BOT_TOKEN')
     chat_ids = os.getenv('TG_CHANNEL_IDS').split(',')
     use_local_api = True
@@ -131,7 +146,7 @@ if __name__ == "__main__":
             {'$sort': {'snap_date': 1}}], show_id=True)
         docs = [MongoDoc.model_validate(doc)
                 for doc in results]
-        for doc in docs:
+        for doc in tqdm(docs, desc="Backup Video to TG"):
             video_dir_path = [d for d in dir_path if d.name == doc.parent]
             if len(video_dir_path) > 0:
                 video_dir_path = video_dir_path[0]
@@ -155,27 +170,27 @@ if __name__ == "__main__":
                                             **backup.model_dump(exclude=['message_timestamp'])))
 
                                 title = av_path.absolute().parent.name[5:]
-                                print(f"開始上傳 {title} ...")
+                                log.debug(f"開始上傳 {title} ...")
 
-                                for chat_id in chat_ids:
+                                for chat_id in tqdm(chat_ids, desc=f"Backup {title} to TG Group", leave=False):
                                     bot_id = str(bot_token.split(':')[0])
                                     backup_channel = BackupChannel(
                                         bot_id=bot_id, chat_id=chat_id)
                                     if backup_channel in backup_channels:
-                                        print(
+                                        log.debug(
                                             f'Skip: {title} at: {backup_channel}')
                                         continue
 
                                     backup_info_timestamp = asyncio.run(
-                                        send_mkv_video(bot_token, chat_id, av_path, doc.SN))
+                                        send_mkv_video(bot_token, chat_id, av_path, doc.SN, log))
                                     if backup_info_timestamp is not None:
                                         backup_info = BackupMessage(
                                             **backup_info_timestamp.model_dump(exclude=['message_timestamp']))
                                         if backup_info not in backup_messages:
-                                            print('更新 TG Backup 資訊')
+                                            log.debug('更新 TG Backup 資訊')
                                             h.update({'_id': doc.id},
                                                      {'$push': {'tg_backup': backup_info_timestamp.model_dump()}})
     except KeyboardInterrupt:
-        print("\n用戶中斷了程序。")
+        log.debug("\n用戶中斷了程序。")
     except Exception as e:
-        print(f"發生錯誤：{error_msg(e)}")
+        log.error(f"發生錯誤：{error_msg(e)}")

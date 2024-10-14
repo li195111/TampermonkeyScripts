@@ -1,14 +1,10 @@
 import os
-import shutil
-import subprocess as sp
 from pathlib import Path
-from typing import List
 
 from dotenv import load_dotenv
 
-from models.logger import logger
 from handlers.mongo import MongoHandler
-
+from models.logger import logger
 
 if __name__ == '__main__':
     load_dotenv()
@@ -31,7 +27,7 @@ if __name__ == '__main__':
     #         folder_path = dst_dir.joinpath(folder['dir_name'])
     #         print(folder_path.exists(), folder_path)
 
-    mp4_files = list(handler.aggregate([{'$unwind': {'path': '$videos','includeArrayIndex': 'idx','preserveNullAndEmptyArrays': True}},
+    mp4_files = list(handler.aggregate([{'$unwind': {'path': '$videos', 'includeArrayIndex': 'idx', 'preserveNullAndEmptyArrays': True}},
                                         {'$match': {'videos.type': '.mp4'}}]))
     remove_count = 0
     for file in mp4_files:
@@ -40,7 +36,8 @@ if __name__ == '__main__':
             dst_dir = dst_dir[0]
             folder_path = dst_dir.joinpath(file['dir_name'])
             if folder_path.exists():
-                mp4_path = folder_path.joinpath(f"{file['videos']['name']}{file['videos']['type']}")
+                mp4_path = folder_path.joinpath(
+                    f"{file['videos']['name']}{file['videos']['type']}")
                 if mp4_path.exists():
                     log.info("Remove: %s", mp4_path)
                     os.remove(mp4_path)

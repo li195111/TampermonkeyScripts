@@ -6,8 +6,8 @@ from dotenv import load_dotenv
 from tqdm import tqdm
 
 from handlers.mongo import MongoHandler
+from models.base import MongoDoc
 from models.logger import logger
-from send_video_to_tg_channel import MongoDoc
 
 if __name__ == '__main__':
     load_dotenv()
@@ -27,7 +27,8 @@ if __name__ == '__main__':
     results = list(h.aggregate([{'$match': {'doc_type': 'av_info',
                                             'tg_backup': {'$exists': True},
                                             '$expr': {'$gte': [{'$size': "$tg_backup"}, 2]},
-                                            'on_local': {'$exists': False}}},
+                                            '$or': [{'on_local': {'$exists': False}},
+                                                    {'on_local': True}]}},
                                 ], show_id=True))
     backuped_docs = [MongoDoc.model_validate(doc) for doc in results]
     for doc in tqdm(backuped_docs, desc="Remove Backuped"):

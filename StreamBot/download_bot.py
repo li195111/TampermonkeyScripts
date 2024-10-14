@@ -44,7 +44,7 @@ class IURLDownloadBot(Log):
                                            progress_length=self.progress_length,
                                            max_connect=3,
                                            logger=self.logger)
-        self.file_manager_cols = list(QueueItem.__fields__.keys())
+        self.file_manager_cols = list(QueueItem.model_fields.keys())
         self.max_threads = max_threads
         self.handler = MongoHandler()
 

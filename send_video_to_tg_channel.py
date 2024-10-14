@@ -3,63 +3,19 @@ import os
 from datetime import datetime
 from logging import Logger
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
-from bson import ObjectId
 from dotenv import load_dotenv
-from pydantic import Field
 from telegram import Bot, InputFile
 from telegram.error import NetworkError, RetryAfter, TimedOut
 from telegram.request import HTTPXRequest
 from tqdm import tqdm
 
 from handlers.mongo import MongoHandler
-from models.base import IBase
+from models.base import (BackupChannel, BackupInfoTimeStamp, BackupMessage,
+                         MongoDoc)
 from models.logger import logger
 from StreamBot.utils import error_msg
-
-
-class BackupChannel(IBase):
-    bot_id: str
-    chat_id: str
-
-
-class BackupMessage(BackupChannel):
-    bot_id: str
-    chat_id: str
-    message_id: str
-
-
-class BackupInfoTimeStamp(BackupMessage):
-    message_timestamp: datetime
-
-
-class Video(IBase):
-    name: str
-    type: str
-    size: int
-    width: int
-    height: int
-
-
-class MongoDoc(IBase):
-    id: Optional[ObjectId] | None = Field(alias="_id", default=None)
-    dir_name: str
-    parent: str
-    source: str
-    title: str
-    videos: List[Video] = []
-    snap_date: datetime
-    doc_type: str
-    tags: List[str] = []
-    SN: Optional[str] | None = None
-    tg_backup: Optional[List[BackupInfoTimeStamp]] = []
-    on_local: Optional[bool] = True
-
-    class Config:
-        populate_by_name = True
-        json_encoders = {ObjectId: str}
-        arbitrary_types_allowed = True
 
 
 async def send_mkv_video(bot_token: str, chat_id: str, video_path: str | Path, sn: str, log: Optional[Logger] = None):
@@ -98,7 +54,7 @@ async def send_mkv_video(bot_token: str, chat_id: str, video_path: str | Path, s
                 chat_id=chat_id,
                 video=input_file,
                 filename=file_path.name,
-                caption=f'番號: {sn or ""}\n片名：{title}\nBackup At: {message_timestamp.strftime("%Y-%m-%d")}',
+                caption=f'番號: {sn or ""}\n片名: {title}\nBackup At: {message_timestamp.strftime("%Y-%m-%d")}',
                 parse_mode=None,
                 supports_streaming=True,
             )

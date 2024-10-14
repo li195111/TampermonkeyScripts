@@ -44,7 +44,7 @@ if __name__ == '__main__':
 
             # Check Exists
             doc = h.query_one(
-                {'dir_name': dir_name, 'parent': parent}, show_id=True) or {}
+                {'dir_name': dir_name, 'parent': parent}, show_id=True) or {'doc_type': 'av_info'}
 
             old_docs = list(h.query({'$and': [{'dir_name': dir_name}]})) or []
             if len(old_docs) == 1:
@@ -216,7 +216,8 @@ if __name__ == '__main__':
         update_count = h.update({'snap_date': snap_date},
                                 {'$set': {'n_videos': n_docs}}, sys=True)
     else:
-        inserted_count = h.insert([{'n_videos': n_docs, 'snap_date': snap_date}], sys=True)
+        inserted_count = h.insert(
+            [{'n_videos': n_docs, 'snap_date': snap_date}], sys=True)
     log.info(f'Update {update_count} documents from {h.default_sys_col}')
     log.info(f'Insert {inserted_count} documents to {h.default_sys_col}')
 

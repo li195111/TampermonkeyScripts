@@ -83,7 +83,7 @@ class DownloadManager:
 async def preload_videos(idx: int, docs: list[MongoDoc], dir_path: list[Path], log: Logger, download_manager: DownloadManager):
     total_docs = len(docs)
     preload_count = 0
-    print(f"預先下載影片")
+    log.info("預先下載影片")
     for i in range(1, 11):  # 預先下載接下來的10個視頻
         next_idx = idx + i
         if next_idx < total_docs:
@@ -236,7 +236,7 @@ async def send_mkv_video(bot_token: str, chat_id: str, title: str, filename: str
             supports_streaming=True,
         )
         et = datetime.now()
-        log(f"\n上傳成功！ 費時: {et - st}")
+        log(f"上傳成功！ 費時: {et - st}")
         backup_info = {'bot_id': str(bot.id),
                        'chat_id': str(chat_id),
                        'message_id': str(video_message.id),
@@ -244,15 +244,15 @@ async def send_mkv_video(bot_token: str, chat_id: str, title: str, filename: str
                        }
         return BackupInfoTimeStamp(**backup_info)
     except TimedOut:
-        log("\n上傳超時。可能需要更長的 timeout 時間或更好的網絡連接。")
+        log("上傳超時。可能需要更長的 timeout 時間或更好的網絡連接。")
     except RetryAfter as e:
-        log(f"\n超過速率限制。建議等待 {e.retry_after} 秒後重試。")
+        log(f"超過速率限制。建議等待 {e.retry_after} 秒後重試。")
     except NetworkError as e:
-        log(f"\n網絡錯誤：{e}. 請檢查你的網絡連接和本地 Bot API 服務器狀態。")
+        log(f"網絡錯誤：{e}. 請檢查你的網絡連接和本地 Bot API 服務器狀態。")
     except KeyboardInterrupt:
-        log("\n用戶中斷了程序。")
+        log("用戶中斷了程序。")
     except Exception as e:
-        log(f"\n上傳視頻時發生錯誤: {type(e).__name__}: {e}")
+        log(f"上傳視頻時發生錯誤: {type(e).__name__}: {e}")
 
 
 def get_av_file(doc: MongoDoc, dir_path: list[Path], log: Logger):

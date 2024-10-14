@@ -16,6 +16,7 @@ tqdm = "^4.66.5"
 requests = "^2.32.3"
 numpy = "<2"
 pydantic = "^2.9.2"
+aiofiles = "^24.1.0"
 
 
 [build-system]

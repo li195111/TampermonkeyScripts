@@ -8,8 +8,9 @@ from urllib.request import urlretrieve
 
 import requests
 
-from .models import URL, Error, IMedia, IStream, Log
-from .utils import error_msg
+from models.base import Error
+
+from .models import URL, IMedia, IStream, Log
 
 
 class Stream(IStream):
@@ -126,15 +127,14 @@ class Stream(IStream):
                     if self.is_finished:
                         self.complete()
                         self.save()
-                except TimeoutError as err:
-                    msg = f"TimeoutError: {err.args[0]}"
-                    self.logger.warning(msg)
-                    error = Error(message={"result": error_msg(err)})
-                    self.logger.warning(error)
-                except requests.ConnectionError as err:
+                except TimeoutError as e:
+                    err = Error.from_exc('TimeoutError: ', e)
+                    self.logger.warning(err.title)
+                    self.logger.warning(err.message)
+                except requests.ConnectionError as e:
                     pass
-                except requests.HTTPError as err:
-                    if str(err.args[0])[:3] == '410':
+                except requests.HTTPError as e:
+                    if str(e.args[0])[:3] == '410':
                         # URL Gone
                         self.connect_count = self.max_connect
                         # Remove Expired File
@@ -142,30 +142,30 @@ class Stream(IStream):
                             f'URL Expired: {self.url.dir_name}')
                         # os.remove(self.url.file_path)
                         self.failed()
-                    elif str(err.args[0])[:3] == '416':
+                    elif str(e.args[0])[:3] == '416':
                         # Complete
                         self.total_size = self.size
                         self.logger.warning(f'Complete: {self.url.file_dir}')
                         self.complete()
                     else:
-                        error = Error(message={"result": error_msg(err)})
-                        self.logger.warning(error)
-                except requests.Timeout as err:
+                        err = Error.from_exc('requests.HTTPError: ', e)
+                        self.logger.warning(err.title)
+                        self.logger.warning(err.message)
+                except requests.Timeout as e:
                     pass
                 except KeyboardInterrupt:
                     msg = "Interrupt"
                     self.logger.warning(msg)
                     self.interrupt()
                     self.save()
-                except requests.exceptions.ChunkedEncodingError as err:
+                except requests.exceptions.ChunkedEncodingError as e:
                     self.logger.warning(
-                        f"ChunkedEncodingError: {self.url.dir_name} {err.args}")
+                        f"ChunkedEncodingError: {self.url.dir_name} {e.args}")
                     self.failed()
-                except Exception as err:
-                    self.logger.warning(
-                        f"Failed: {self.url.dir_name} {err.args}")
-                    error = Error(message={"result": error_msg(err)})
-                    self.logger.warning(error)
+                except Exception as e:
+                    err = Error.from_exc('Exception Error: ', e)
+                    self.logger.warning(err.title)
+                    self.logger.warning(err.message)
                     self.failed()
                     self.connect_count += 1
                 finally:
@@ -184,9 +184,10 @@ class Media(IMedia):
                 urlretrieve(self.url.url, self.url.file_path)
                 time.sleep(0.5)
                 self.complete()
-            except Exception as err:
-                error = Error(message={"result": error_msg(err)})
-                self.logger.info(error)
+            except Exception as e:
+                err = Error.from_exc('Exception Error: ', e)
+                self.logger.warning(err.title)
+                self.logger.warning(err.message)
 
 
 class StreamDownloader(Log):

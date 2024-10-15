@@ -6,6 +6,6 @@ from .utils import *
 
 __all__ = [
     IURLDownloadBot, URLDownloadBot, BotType, MediaType, FileSizeLevel,
-    IStream, Stream, StreamDownloader, IBase, Error, CacheInfo, URL,
-    IURLs, URLs, setup_logger, error_msg, count_bytes_level
+    IStream, Stream, StreamDownloader, IBase, CacheInfo, URL,
+    IURLs, URLs, setup_logger, count_bytes_level
 ]

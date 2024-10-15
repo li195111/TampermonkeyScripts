@@ -10,7 +10,7 @@ from telegram.error import NetworkError, RetryAfter, TelegramError, TimedOut
 from telegram.ext import CallbackContext, MessageHandler, Updater
 from telegram.request import HTTPXRequest
 
-from StreamBot.utils import error_msg
+from models.base import Error
 
 
 async def get_all_messages():
@@ -36,7 +36,6 @@ async def get_all_messages():
         print(f"發生錯誤：{e}")
         updates = []
 
-
     for update in updates:
         print('Update')
         print(update)
@@ -46,22 +45,27 @@ async def get_all_messages():
             user_command = update.message.text
             print('User Command:', user_command)
         except Exception as e:
-            print(error_msg(e))
+            err = Error.from_exc('Exception: ', e)
+            print(err.title)
+            print(err.message)
 
         try:
             video = update.message.video
-            name = "{}-{}-{}x{}.mp4".format(video.file_name,update.update_id,video.width,video.height)
+            name = "{}-{}-{}x{}.mp4".format(video.file_name,
+                                            update.update_id, video.width, video.height)
             tfile = await bot.getFile(video.file_id)
             print('File Name:', name)
             print('File Path:', tfile.file_path)
             # filename.append(name)
             # urls.append(tfile.file_path)
         except Exception as e:
-            print(error_msg(e))
+            err = Error.from_exc('Exception: ', e)
+            print(err.title)
+            print(err.message)
 
     # messages = []
     # async for update in updates:
-        
+
     #     if update.channel_post and update.channel_post.chat.id == chat_id:
     #         print(update.channel_post.text)
     #         messages.append(update.channel_post.text)

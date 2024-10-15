@@ -9,21 +9,7 @@ from urllib.parse import urlparse
 from models.base import IBase, Log, LogThread
 
 from .enums import FileSizeLevel, FileState, MediaType
-from .utils import count_bytes_level, error_msg
-
-
-class ErrorMsg(IBase):
-    result: str
-
-    def __repr__(self) -> str:
-        return self.result
-
-
-class Error(IBase):
-    message: ErrorMsg
-
-    def __repr__(self) -> str:
-        return self.message
+from .utils import count_bytes_level
 
 
 class CacheInfo(IBase):
@@ -189,7 +175,7 @@ class IURLs(Log):
         with open(file_path, 'r', encoding='utf-8') as fp:
             urls = fp.read()
 
-        return cls(prefix, media_name, media_type, urls, dst_dir,**kwargs)
+        return cls(prefix, media_name, media_type, urls, dst_dir, **kwargs)
 
 
 class URLs(IURLs):
@@ -201,7 +187,7 @@ class URLs(IURLs):
                  urls: Union[str, List[str]],
                  dst_dir: str = '.',
                  **kwargs) -> None:
-        super().__init__(prefix, media_name, media_type, urls, dst_dir,**kwargs)
+        super().__init__(prefix, media_name, media_type, urls, dst_dir, **kwargs)
 
     @classmethod
     def from_file(cls,
@@ -210,7 +196,7 @@ class URLs(IURLs):
                   media_type: MediaType,
                   dst_dir: str = '.',
                   **kwargs) -> URLs:
-        return super().from_file(file_path, bot_prefix, media_type, dst_dir,**kwargs)
+        return super().from_file(file_path, bot_prefix, media_type, dst_dir, **kwargs)
 
 
 class IStream(LogThread):
@@ -316,9 +302,10 @@ class IStream(LogThread):
                 if os.path.exists(old_cache_path):
                     try:
                         os.remove(old_cache_path)
-                    except Exception as err:
-                        error = Error(message={"result": error_msg(err)})
-                        self.logger.warning(error)
+                    except Exception as e:
+                        err = Error.from_exc('Exception Error: ', e)
+                        self.logger.warning(err.title)
+                        self.logger.warning(err.message)
             self.is_leave = pass_exists
             if pass_exists:
                 self.complete()

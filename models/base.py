@@ -9,10 +9,28 @@ import pydantic
 from bson import ObjectId
 
 from models.logger import logger
+from utils.general import error_msg
 
 
 class IBase(pydantic.BaseModel):
     ...
+
+
+class Error(IBase):
+    '''Error Model'''
+    title: str
+    message: str
+
+    @classmethod
+    def from_exc(cls, exc_type_str: str, exc: Exception):
+        title = f'{exc_type_str}: '
+        msg = error_msg(exc)
+        if isinstance(exc.args, (list, tuple)):
+            args = [str(arg) for arg in exc.args]
+            title += ';'.join(args)
+        else:
+            title += str(exc.args)
+        return cls(title=title, message=msg)
 
 
 class Log(object):

@@ -10,11 +10,11 @@ from typing import List, Union
 import pandas as pd
 
 from handlers.mongo import MongoHandler
+from models.base import Error
 
 from .downloader import StreamDownloader
 from .enums import BotType, FileState, MediaType
-from .models import URL, Error, Log, QueueItem, URLs
-from .utils import error_msg
+from .models import URL, Log, QueueItem, URLs
 
 
 class IURLDownloadBot(Log):
@@ -26,7 +26,7 @@ class IURLDownloadBot(Log):
                  max_queue: int = 5,
                  max_threads: int = 3,
                  **kwargs) -> None:
-        super().__init__(bot_type=bot_type,**kwargs)
+        super().__init__(bot_type=bot_type, **kwargs)
         self.__type = bot_type
         self.__prefix = f'{self.type.value}_bot_'
         self.__src = src_dir
@@ -106,12 +106,13 @@ class IURLDownloadBot(Log):
     def match_queue(self, file_name: str):
         result = []
         try:
-            file_name = file_name.replace('[','\[').replace(']','\]')
+            file_name = file_name.replace('[', '\[').replace(']', '\]')
             pattern = re.compile(rf'{file_name}')
         except re.error:
             self.log(f're.compile Error: {file_name}')
         try:
-            result = [q for q in self.queue if pattern.search(q.file_name, re.IGNORECASE)]
+            result = [q for q in self.queue if pattern.search(
+                q.file_name, re.IGNORECASE)]
         except re.error:
             self.log(f're.search Error: {file_name}')
         except NameError:
@@ -196,7 +197,8 @@ class URLDownloadBot(IURLDownloadBot):
 
         for file_path in file_paths:
             dir_name = '_'.join(file_path.stem.split('_')[:-2])
-            dir_name = dir_name.replace('{','\{').replace('}','\}').replace(')','\)').replace('(','\(').replace('[','\[').replace(']','\]')
+            dir_name = dir_name.replace('{', '\{').replace('}', '\}').replace(
+                ')', '\)').replace('(', '\(').replace('[', '\[').replace(']', '\]')
             # SN
             matches = [re.findall(reg, file_path.stem) for reg in regexs]
             sn_code = None
@@ -205,9 +207,11 @@ class URLDownloadBot(IURLDownloadBot):
                 if m:
                     sn_code = m[0].replace(' ', '-').replace('_', '').upper()
             if sn_code:
-                exists_file = self.handler.query_one({'SN': {'$regex': re.compile(rf"{sn_code}")}})
+                exists_file = self.handler.query_one(
+                    {'SN': {'$regex': re.compile(rf"{sn_code}")}})
             else:
-                exists_file = self.handler.query_one({'dir_name': {'$regex': re.compile(rf"{dir_name}")}})
+                exists_file = self.handler.query_one(
+                    {'dir_name': {'$regex': re.compile(rf"{dir_name}")}})
 
             if self.queue_size < self.max_queue and not exists_file:
                 # Add to queue
@@ -242,7 +246,7 @@ class URLDownloadBot(IURLDownloadBot):
     def process_item(self, item: QueueItem):
         if item.state == FileState.QUEUE and os.path.exists(item.file_path):
             item.urls = URLs.from_file(item.file_path, self.prefix, item.media_type,
-                                       self.dst,logger=self.logger)
+                                       self.dst, logger=self.logger)
             if len(item.urls) == 0:
                 self.remove_queue.append(item)
             for url in item.urls:
@@ -328,16 +332,16 @@ class URLDownloadBot(IURLDownloadBot):
 
                 self.clean_threads()
 
-        except Exception as err:
+        except Exception as e:
+            err = Error.from_exc('get_av_file 發生錯誤 Exception: ', e)
+            self.warn(err.title)
+            self.warn(err.message)
             print(end='\n\33[K\33[F')
-            self.warn('Error')
-            error = Error(message={"result": error_msg(err)})
-            self.warn(error)
             # self.log(f'Current Item: {current_item}')
             for item in self.queue:
                 for t in item.threads:
                     t.is_failed = True
-            raise err
+            raise e
 
         except KeyboardInterrupt:
             print(end='\n\33[K\33[F')

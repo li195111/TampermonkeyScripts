@@ -246,13 +246,13 @@ async def send_mkv_video(bot_token: str, chat_id: str, title: str, filename: str
     except TimedOut:
         log("上傳超時。可能需要更長的 timeout 時間或更好的網絡連接。")
     except RetryAfter as e:
-        log(f"超過速率限制。建議等待 {e.retry_after} 秒後重試。")
+        log(f"{error_msg(e)} 超過速率限制。建議等待 {e.retry_after} 秒後重試。")
     except NetworkError as e:
-        log(f"網絡錯誤：{e}. 請檢查你的網絡連接和本地 Bot API 服務器狀態。")
+        log(f"網絡錯誤: {error_msg(e)}. 請檢查你的網絡連接和本地 Bot API 服務器狀態。")
     except KeyboardInterrupt:
         log("用戶中斷了程序。")
     except Exception as e:
-        log(f"上傳視頻時發生錯誤: {type(e).__name__}: {e}")
+        log(f"上傳視頻時發生錯誤: {error_msg(e)}")
 
 
 def get_av_file(doc: MongoDoc, dir_path: list[Path], log: Logger):

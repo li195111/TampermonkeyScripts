@@ -50,6 +50,7 @@ class DownloadManager:
         self.active_downloads: Set[asyncio.Task] = set()
         self.total_preload: int = 0
         self.completed_preload: int = 0
+        self.preload_numbers: int = 1
 
     async def add_to_queue(self, file_path: Path):
         self.download_queue.append(file_path)
@@ -74,7 +75,7 @@ class DownloadManager:
     async def get_downloaded_file(self, file_path: Path) -> Optional[Path]:
         while file_path not in self.downloaded_files:
             await asyncio.sleep(0.1)
-        return self.downloaded_files.get(file_path)
+        return self.downloaded_files.pop(file_path)
 
     def get_preload_status(self):
         return self.completed_preload, self.total_preload
@@ -84,7 +85,8 @@ async def preload_videos(idx: int, docs: list[MongoDoc], dir_path: list[Path], l
     total_docs = len(docs)
     preload_count = 0
     log.info("預先下載影片")
-    for i in range(1, 11):  # 預先下載接下來的10個視頻
+    # 預先下載接下來的 N 個視頻
+    for i in range(1, download_manager.preload_numbers + 1):
         next_idx = idx + i
         if next_idx < total_docs:
             next_av_path = get_av_file(docs[next_idx], dir_path, log)
@@ -114,7 +116,7 @@ async def main(log: Logger, h: MongoHandler):
         if av_path:
             await download_manager.add_to_queue(av_path)
 
-        # 預先下載接下來的10個視頻
+        # 預先下載接下來的 N 個視頻
         # 在後台啟動預加載任務
         preload_task = asyncio.create_task(preload_videos(
             idx, docs, dir_path, log, download_manager))

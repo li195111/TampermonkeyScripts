@@ -2,7 +2,7 @@ import os
 import shutil
 import subprocess as sp
 from pathlib import Path
-from typing import List
+from typing import List, Union
 
 from dotenv import load_dotenv
 from tqdm import tqdm
@@ -14,7 +14,7 @@ from playground import History
 
 
 class CleanUp(IBase):
-    docs: List[MongoDoc | History]
+    docs: List[Union[MongoDoc, History]]
 
 
 if __name__ == '__main__':

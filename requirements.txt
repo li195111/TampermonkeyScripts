@@ -11,6 +11,4 @@ pydantic
 fastapi
 uvicorn
 
-concurrent-log-handler
-
 pymongo

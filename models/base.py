@@ -64,7 +64,7 @@ class Video(IBase):
 
 
 class MongoDoc(IBase):
-    id: Optional[ObjectId] | None = pydantic.Field(alias="_id", default=None)
+    id: Optional[ObjectId] = pydantic.Field(alias="_id", default=None)
     dir_name: str
     parent: str
     source: str
@@ -73,7 +73,7 @@ class MongoDoc(IBase):
     snap_date: datetime
     doc_type: str
     tags: List[str] = []
-    SN: Optional[str] | None = None
+    SN: Optional[str] = None
     tg_backup: Optional[List[BackupInfoTimeStamp]] = []
     on_local: Optional[bool] = True
 

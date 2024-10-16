@@ -39,8 +39,12 @@ async def download_file(file_path: Path, semaphore: Semaphore) -> Optional[Path]
             async with aiofiles.open(file_path, 'rb') as file:
                 await file.read()  # 模擬文件讀取操作
             return file_path
+        except FileNotFoundError:
+            return file_path
         except Exception as e:
-            print(f"Error downloading {file_path}: {e}")
+            err = Error.from_exc('download_file 發生錯誤 Exception: ', e)
+            print(err.title)
+            print(err.message)
             return None
 
 
@@ -86,11 +90,11 @@ class DownloadManager:
 async def preload_videos(idx: int, docs: list[MongoDoc], dir_path: list[Path], log: Logger, download_manager: DownloadManager):
     total_docs = len(docs)
     preload_count = 0
-    # log.info("預先下載影片")
     # 預先下載接下來的 N 個影片
     for i in range(1, download_manager.preload_numbers + 1):
         next_idx = idx + i
         if next_idx < total_docs:
+            # log.info(f"預先下載影片: {docs[next_idx].dir_name[5:]}")
             next_av_path = get_av_file(docs[next_idx], dir_path, log)
             if next_av_path:
                 await download_manager.add_to_queue(next_av_path)
@@ -118,6 +122,7 @@ async def main(log: Logger, h: MongoHandler):
     for idx, doc in enumerate(docs):
         av_path = get_av_file(doc, dir_path, log)
         if av_path:
+            # log.info(f"預先下載影片: {av_path.absolute().parent.name[5:]}")
             await download_manager.add_to_queue(av_path)
 
         # 預先下載接下來的 N 個影片
@@ -128,7 +133,7 @@ async def main(log: Logger, h: MongoHandler):
         if av_path:
             # 等待當前影片下載完成
             downloaded_file = await download_manager.get_downloaded_file(av_path)
-            if downloaded_file:
+            if downloaded_file and downloaded_file.exists():
                 # 使用下載好的文件進行後續操作
                 await process_video(h=h,
                                     doc=doc,
@@ -182,6 +187,8 @@ async def process_video(h: MongoHandler, doc: MongoDoc, file_path: Path, bot_tok
                 **backup.model_dump(exclude=['message_timestamp', 'message_id'])))
             backup_messages.append(BackupMessage(
                 **backup.model_dump(exclude=['message_timestamp'])))
+    if file_path.exists():
+        h.update({'_id': doc.id}, {'$set': {'on_local': True}})
 
     title = file_path.absolute().parent.name[5:]
     if file_path.stat().st_size > MAX_FILE_SIZE:

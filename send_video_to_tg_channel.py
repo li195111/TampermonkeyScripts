@@ -250,8 +250,9 @@ async def send_mkv_video(bot_token: str, chat_id: str, title: str, filename: str
     request = HTTPXRequest(connection_pool_size=12,  # 最大連接數
                            read_timeout=1*60*60,  # 1 小時
                            write_timeout=1*60*60,  # 1 小時
-                           connect_timeout=1*60*15,  # 15 分鐘
+                           connect_timeout=1*60*60,  # 1 小時
                            media_write_timeout=1*60*60,  # 1 小時
+                           pool_timeout=1*60*60  # 1 小時
                            )
     bot = Bot(token=bot_token,
               request=request,
@@ -263,9 +264,9 @@ async def send_mkv_video(bot_token: str, chat_id: str, title: str, filename: str
     retry_delay = 1
 
     while not finished and tries < max_retries:
+        log(f"上傳至 Channel: {chat_id} ...")
+        st = datetime.now()
         try:
-            log(f"上傳至 Channel: {chat_id} ...")
-            st = datetime.now()
             video_message = await bot.send_video(
                 chat_id=chat_id,
                 video=input_file,
@@ -273,6 +274,10 @@ async def send_mkv_video(bot_token: str, chat_id: str, title: str, filename: str
                 caption=f'番號: {sn or ""}\n片名: {title}\nBackup At: {st.strftime("%Y-%m-%d %H:%M:%S.%f")}',
                 parse_mode=None,
                 supports_streaming=True,
+                pool_timeout=1*60*60,  # 1 小時
+                read_timeout=1*60*60,  # 1 小時
+                write_timeout=1*60*60,  # 1 小時
+                connect_timeout=1*60*60,  # 1 小時
             )
             et = datetime.now()
             log(f"上傳成功！ 費時: {et - st}")
@@ -284,6 +289,8 @@ async def send_mkv_video(bot_token: str, chat_id: str, title: str, filename: str
             return BackupInfoTimeStamp(**backup_info)
         except (TimedOut, NetworkError) as e:
             err = Error.from_exc('Network Error: ', e)
+            et = datetime.now()
+            log(f'於 {et - st} 後發生錯誤')
             log(err.title)
             log(err.message)
             log(
@@ -301,6 +308,8 @@ async def send_mkv_video(bot_token: str, chat_id: str, title: str, filename: str
             finished = True
         except Exception as e:
             err = Error.from_exc('上傳影片時發生錯誤 Exception: ', e)
+            et = datetime.now()
+            log(f'於 {et - st} 後發生錯誤')
             log(err.title)
             log(err.message)
             finished = True

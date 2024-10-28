@@ -118,7 +118,6 @@ async def main(log: Logger, h: MongoHandler):
     docs = [MongoDoc.model_validate(doc)
             for doc in results]
 
-    # 假設這是你的主要處理循環
     for idx, doc in enumerate(docs):
         av_path = get_av_file(doc, dir_path, log)
         if av_path:
@@ -313,7 +312,11 @@ async def send_mkv_video(bot_token: str, chat_id: str, title: str, filename: str
             log(err.title)
             log(err.message)
             finished = True
-    return None
+    return BackupInfoTimeStamp(**{'bot_id': str(bot.id),
+                                  'chat_id': str(chat_id),
+                                  'message_id': None,
+                                  'message_timestamp': None
+                                  })
 
 
 def get_av_file(doc: MongoDoc, dir_path: list[Path], log: Logger):

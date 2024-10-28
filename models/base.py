@@ -66,11 +66,11 @@ class BackupChannel(IBase):
 class BackupMessage(BackupChannel):
     bot_id: str
     chat_id: str
-    message_id: str
+    message_id: Optional[str]
 
 
 class BackupInfoTimeStamp(BackupMessage):
-    message_timestamp: datetime
+    message_timestamp: Optional[datetime]
 
 
 class Video(IBase):

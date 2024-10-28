@@ -53,13 +53,14 @@ if __name__ == '__main__':
                       'username': 'admin'},
                      {'$inc': {'count': 1}})
 
+    print(f'Search Query: {search}')
     search_agg = search_string_to_mongodb_pipeline(search)
     search_agg.update({'doc_type': 'av_info'})
     print('Search Match query: ', search_agg)
     result = list(h.aggregate([{'$match': search_agg},
-                               {'$project': {'_id': 0}},
+                               #    {'$project': {'_id': 0}},
                                {'$sort': {'snap_date': 1}},
-                               ]))
+                               ], show_id=True))
 
     docs = [MongoDoc.model_validate(doc) for doc in result]
     df = pd.DataFrame(result)
@@ -84,6 +85,8 @@ if __name__ == '__main__':
                                 print(f'Not Exists: {doc.dir_name}')
                         else:
                             local_docs.append(av_dir_path.as_posix())
+        result = h.update_one({'_id': doc.id},
+                              {'$set': {'tags': list(set(doc.tags + [search]))}})
 
     for doc in tg_channel_docs:
         print('On TG Channel: ', doc)

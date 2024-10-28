@@ -11,6 +11,163 @@ from handlers.mongo import MongoHandler
 from models.logger import logger
 from utils import get_video_infos, split_tags
 
+
+def process_videos(videos: List[Path], h: MongoHandler, snap_date: datetime, log: logger, title_filters: List[str], regexs: List[str], tag_regs: List[str], vid_types: List[str]) -> List[dict]:
+    for p in tqdm(videos, desc='Video Progress'):
+        update = False
+        dir_name = p.name
+        parent = p.parent.name
+
+        # Check Exists
+        doc = h.query_one(
+            {'dir_name': dir_name, 'parent': parent}, show_id=True) or {'doc_type': 'av_info'}
+
+        old_docs = list(h.query({'$and': [{'dir_name': dir_name}]})) or []
+        if len(old_docs) == 1:
+            old_doc = old_docs[0]
+        else:
+            old_doc = {}
+        exists_vids = doc.get('videos') or old_doc.get('videos') or []
+
+        name_split = p.name.split('_')
+        src = name_split[0]
+        title = '_'.join(name_split[1:])
+        for title_f in title_filters:
+            if len(title_f) > 15:
+                for i in range(7):
+                    title = title.replace(title_f[:-i], '')
+            else:
+                title = title.replace(title_f, '')
+        title = title.replace('_', ' ')
+
+        # SN
+        matches = [re.findall(reg, title) for reg in regexs]
+        sn_code = None
+        for m in matches:
+            if m:
+                sn_code = m[0].replace(' ', '-').replace('_', '').upper()
+        if sn_code:
+            title = title.replace(sn_code, '')
+
+        # Tag
+        tags = []
+        for r in tag_regs:
+            pattern = re.compile(r)
+            tag_ms = pattern.search(title)
+            if tag_ms:
+                tag_barket = tag_ms.group()
+                title = title.replace(tag_barket, '')
+                tag = tag_barket[1:-1]
+                if tag and not tag.isnumeric():
+                    split_tags(tag, tags)
+        filted_tags = []
+        for tag in tags:
+            ms = []
+            for reg in regexs:
+                ms.extend(re.findall(reg, tag))
+            if ms:
+                continue
+            filted_tags.append(tag)
+        filted_tags.sort()
+
+        # Video Infos
+        exists_vid_names = [
+            f"{v['name']}{v['type']}" for v in exists_vids if v.get('name')]
+        exists_vid_names.sort()
+        vids = []
+        complete = list(p.glob(f'*.mkv'))
+        if complete:
+            for t in vid_types:
+                vs = list(p.glob(f'*.{t}'))
+                for v in vs:
+                    v_name = v.stem
+                    if f"{v_name}{v.suffix}" in exists_vid_names:
+                        continue
+                    v_p = v.as_posix()
+                    vid_infos = get_video_infos(v_p)
+                    size = os.path.getsize(v_p)
+                    infos = {'name': v_name, 'type': v.suffix,
+                             'size': size, **vid_infos}
+                    vids.append(infos)
+        vid_names = [f"{v['name']}{v['type']}" for v in vids]
+        vid_names.sort()
+
+        # Special Title Filter
+        chars = [' 00', '~', '»', '★']
+        for char in chars:
+            title = title.replace(char, '')
+
+        while '  ' in title:
+            title = title.replace('  ', ' ')
+        title = title.strip()
+
+        # log.info(f'obj size: {len(doc)}\n{doc}')
+        # To Document Obj
+        if doc.get('dir_name') != dir_name:
+            log.info(
+                f'Update At dir_name: {doc.get("dir_name")}, {dir_name}')
+            doc['dir_name'] = dir_name
+            update = True
+
+        if doc.get('parent') != parent:
+            log.info(f'Update At parent: {doc.get("parent")} {parent}')
+            doc['parent'] = parent
+            update = True
+
+        if doc.get('source') != src:
+            log.info(f'Update At source: {doc.get("source")} {src}')
+            doc['source'] = src
+            update = True
+
+        old_title = doc.get('title')
+        if old_title != title:
+            log.info(f'Update At title: {doc.get("title")} {title}')
+            doc['title'] = title
+            update = True
+
+        if exists_vids and vid_names:
+            if exists_vid_names != vid_names:
+                log.info(
+                    f'Update At videos: {exists_vid_names} {vid_names}')
+                doc['videos'] = exists_vids + vids
+                update = True
+            else:
+                # log.info(f'No Update At videos: {exists_vid_names}')
+                ...
+        elif vid_names:
+            log.info(f'Add At videos: {exists_vids} {vid_names} {vids}')
+            doc['videos'] = vids
+            update = True
+
+        old_sn_code = doc.get('SN')
+        if old_sn_code != sn_code:
+            log.info(f'Update At SN: {doc.get("sn_code")} {sn_code}')
+            doc['SN'] = sn_code
+            update = True
+
+        old_tags = doc.get('tags')
+        if old_tags:
+            old_tags = list(filter(None, old_tags))
+            old_tags = list(filter(lambda x: x != '.', old_tags))
+            old_tags.sort()
+            new_tags = list(filter(None, set(filted_tags + old_tags)))
+            new_tags = list(filter(lambda x: x != '.', new_tags))
+            new_tags.sort()
+            if filted_tags and old_tags != new_tags:
+                log.info(f'Update At Tags: {old_tags} {new_tags}')
+                doc['tags'] = new_tags
+                update = True
+        elif filted_tags:
+            log.info(f'Update At Tags: {old_tags} {filted_tags}')
+            doc['tags'] = filted_tags
+            update = True
+
+        if update:
+            doc['snap_date'] = snap_date
+            docs.append(doc)
+    return docs
+
+
 if __name__ == '__main__':
     st = datetime.now()
     load_dotenv()
@@ -37,158 +194,14 @@ if __name__ == '__main__':
                      '專營FC2PPV_無碼無修.偷拍流出.本土國產',
                      '歐美日韓.無碼.偷拍.流出']
     try:
-        for p in tqdm(videos, desc='Video Progress'):
-            update = False
-            dir_name = p.name
-            parent = p.parent.name
-
-            # Check Exists
-            doc = h.query_one(
-                {'dir_name': dir_name, 'parent': parent}, show_id=True) or {'doc_type': 'av_info'}
-
-            old_docs = list(h.query({'$and': [{'dir_name': dir_name}]})) or []
-            if len(old_docs) == 1:
-                old_doc = old_docs[0]
-            else:
-                old_doc = {}
-            exists_vids = doc.get('videos') or old_doc.get('videos') or []
-
-            name_split = p.name.split('_')
-            src = name_split[0]
-            title = '_'.join(name_split[1:])
-            for title_f in title_filters:
-                if len(title_f) > 15:
-                    for i in range(7):
-                        title = title.replace(title_f[:-i], '')
-                else:
-                    title = title.replace(title_f, '')
-            title = title.replace('_', ' ')
-
-            # SN
-            matches = [re.findall(reg, title) for reg in regexs]
-            sn_code = None
-            for m in matches:
-                if m:
-                    sn_code = m[0].replace(' ', '-').replace('_', '').upper()
-            if sn_code:
-                title = title.replace(sn_code, '')
-
-            # Tag
-            tags = []
-            for r in tag_regs:
-                pattern = re.compile(r)
-                tag_ms = pattern.search(title)
-                if tag_ms:
-                    tag_barket = tag_ms.group()
-                    title = title.replace(tag_barket, '')
-                    tag = tag_barket[1:-1]
-                    if tag and not tag.isnumeric():
-                        split_tags(tag, tags)
-            filted_tags = []
-            for tag in tags:
-                ms = []
-                for reg in regexs:
-                    ms.extend(re.findall(reg, tag))
-                if ms:
-                    continue
-                filted_tags.append(tag)
-            filted_tags.sort()
-
-            # Video Infos
-            exists_vid_names = [
-                f"{v['name']}{v['type']}" for v in exists_vids if v.get('name')]
-            exists_vid_names.sort()
-            vids = []
-            complete = list(p.glob(f'*.mkv'))
-            if complete:
-                for t in vid_types:
-                    vs = list(p.glob(f'*.{t}'))
-                    for v in vs:
-                        v_name = v.stem
-                        if f"{v_name}{v.suffix}" in exists_vid_names:
-                            continue
-                        v_p = v.as_posix()
-                        vid_infos = get_video_infos(v_p)
-                        size = os.path.getsize(v_p)
-                        infos = {'name': v_name, 'type': v.suffix,
-                                 'size': size, **vid_infos}
-                        vids.append(infos)
-            vid_names = [f"{v['name']}{v['type']}" for v in vids]
-            vid_names.sort()
-
-            # Special Title Filter
-            chars = [' 00', '~', '»', '★']
-            for char in chars:
-                title = title.replace(char, '')
-
-            while '  ' in title:
-                title = title.replace('  ', ' ')
-            title = title.strip()
-
-            # log.info(f'obj size: {len(doc)}\n{doc}')
-            # To Document Obj
-            if doc.get('dir_name') != dir_name:
-                log.info(
-                    f'Update At dir_name: {doc.get("dir_name")}, {dir_name}')
-                doc['dir_name'] = dir_name
-                update = True
-
-            if doc.get('parent') != parent:
-                log.info(f'Update At parent: {doc.get("parent")} {parent}')
-                doc['parent'] = parent
-                update = True
-
-            if doc.get('source') != src:
-                log.info(f'Update At source: {doc.get("source")} {src}')
-                doc['source'] = src
-                update = True
-
-            old_title = doc.get('title')
-            if old_title != title:
-                log.info(f'Update At title: {doc.get("title")} {title}')
-                doc['title'] = title
-                update = True
-
-            if exists_vids and vid_names:
-                if exists_vid_names != vid_names:
-                    log.info(
-                        f'Update At videos: {exists_vid_names} {vid_names}')
-                    doc['videos'] = exists_vids + vids
-                    update = True
-                else:
-                    # log.info(f'No Update At videos: {exists_vid_names}')
-                    ...
-            elif vid_names:
-                log.info(f'Add At videos: {exists_vids} {vid_names} {vids}')
-                doc['videos'] = vids
-                update = True
-
-            old_sn_code = doc.get('SN')
-            if old_sn_code != sn_code:
-                log.info(f'Update At SN: {doc.get("sn_code")} {sn_code}')
-                doc['SN'] = sn_code
-                update = True
-
-            old_tags = doc.get('tags')
-            if old_tags:
-                old_tags = list(filter(None, old_tags))
-                old_tags = list(filter(lambda x: x != '.', old_tags))
-                old_tags.sort()
-                new_tags = list(filter(None, set(filted_tags + old_tags)))
-                new_tags = list(filter(lambda x: x != '.', new_tags))
-                new_tags.sort()
-                if filted_tags and old_tags != new_tags:
-                    log.info(f'Update At Tags: {old_tags} {new_tags}')
-                    doc['tags'] = new_tags
-                    update = True
-            elif filted_tags:
-                log.info(f'Update At Tags: {old_tags} {filted_tags}')
-                doc['tags'] = filted_tags
-                update = True
-
-            if update:
-                doc['snap_date'] = snap_date
-                docs.append(doc)
+        docs = process_videos(videos=videos,
+                              h=h,
+                              snap_date=snap_date,
+                              log=log,
+                              title_filters=title_filters,
+                              regexs=regexs,
+                              tag_regs=tag_regs,
+                              vid_types=vid_types)
     except KeyboardInterrupt:
         log.info('Manual Interrupt')
 

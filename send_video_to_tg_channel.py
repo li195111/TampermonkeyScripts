@@ -108,7 +108,7 @@ async def main(log: Logger, h: MongoHandler):
     bot_token = os.getenv('TG_BOT_TOKEN')
     chat_ids = os.getenv('TG_CHANNEL_IDS').split(',')
     use_local_api = True
-    max_retries = 3
+    max_retries = 1
 
     dir_path = [Path(p) for p in os.getenv('VID_DIR_PATH').split(',')]
 
@@ -177,7 +177,7 @@ def calculate_transfer_time(file_size_mb, upload_speed_mbps):
     return transfer_time_seconds, minutes, seconds
 
 
-async def process_video(h: MongoHandler, doc: MongoDoc, file_path: Path, bot_token: str, chat_ids: list[str], log: Logger, use_local_api: bool = False, max_retries: int = 3):
+async def process_video(h: MongoHandler, doc: MongoDoc, file_path: Path, bot_token: str, chat_ids: list[str], log: Logger, use_local_api: bool = False, max_retries: int = 1):
     # 這裡放置你的影片處理和上傳邏輯
     backup_channels = []
     backup_messages = []

@@ -41,3 +41,21 @@ if __name__ == '__main__':
                 shutil.rmtree(folder_path)
                 h.update({'_id': doc.id}, {'$set': {'on_local': False}})
                 log.debug("Removed: %s", folder_path)
+
+    # 檢查已刪除的影片
+    results = list(h.aggregate([{'$match': {'doc_type': 'av_info',
+                                            'tg_backup': {'$exists': True},
+                                            '$expr': {'$gte': [{'$size': "$tg_backup"}, 2]},
+                                            '$and': [{'on_local': {'$exists': True}},
+                                                     {'on_local': False}]}},
+                                ], show_id=True))
+    deleted_docs = [MongoDoc.model_validate(doc) for doc in results]
+    for doc in tqdm(deleted_docs, desc="Check Deleted"):
+        if doc.on_local:
+            continue
+        dst_dir = [dst for dst in dst_dirs if dst.name == doc.parent]
+        if dst_dir:
+            folder_path = dst_dir[0].joinpath(doc.dir_name)
+            if folder_path.exists():
+                shutil.rmtree(folder_path)
+                log.debug("Removed: %s", folder_path)

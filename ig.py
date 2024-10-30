@@ -6,8 +6,8 @@ from typing import List
 from dotenv import load_dotenv
 from tqdm import tqdm
 
-from models.logger import logger
 from handlers.mongo import MongoHandler
+from models.logger import logger
 from utils import get_image_infos, get_video_infos
 
 if __name__ == '__main__':
@@ -113,24 +113,24 @@ if __name__ == '__main__':
                     update = True
 
                 old_width = doc.get('width')
-                if old_width != media_infos['width']:
+                if old_width != media_infos.get('width'):
                     log.info(
-                        f'Update At width: {doc.get("width")} {media_infos["width"]}')
-                    doc['width'] = media_infos['width']
+                        f'Update At width: {doc.get("width")} {media_infos.get("width")}')
+                    doc['width'] = media_infos.get('width')
                     update = True
 
                 old_height = doc.get('height')
-                if old_height != media_infos['height']:
+                if old_height != media_infos.get('height'):
                     log.info(
-                        f'Update At height: {doc.get("height")} {media_infos["height"]}')
-                    doc['height'] = media_infos['height']
+                        f'Update At height: {doc.get("height")} {media_infos.get("height")}')
+                    doc['height'] = media_infos.get('height')
                     update = True
 
                 old_size = doc.get('size')
-                if old_size != media_infos['size']:
+                if old_size != media_infos.get('size'):
                     log.info(
-                        f'Update At size: {doc.get("size")} {media_infos["size"]}')
-                    doc['size'] = media_infos['size']
+                        f'Update At size: {doc.get("size")} {media_infos.get("size")}')
+                    doc['size'] = media_infos.get('size')
                     update = True
 
                 if update:

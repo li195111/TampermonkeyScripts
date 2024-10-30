@@ -28,6 +28,8 @@ def get_video_infos(video_path: str):
 
 def get_image_infos(image_path: str):
     im = cv2.imread(image_path)
+    if im is None:
+        return {'width': 0, 'height': 0}
     height, width = im.shape[:2]
     return {'width': width, 'height': height}
 

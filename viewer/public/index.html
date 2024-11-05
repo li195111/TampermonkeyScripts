@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>漫畫閱讀器</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .controls {
+            position: sticky;
+            top: 0;
+            background-color: white;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 100;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .width-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 15px;
+        }
+        .width-control input[type="range"] {
+            width: 150px;
+        }
+        .width-control input[type="number"] {
+            width: 60px;
+            padding: 4px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .image-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .image-container img {
+            display: block;
+            max-width: 100%;
+            width: 40rem;  /* 預設寬度 */
+            margin: 0 auto 20px;
+            border-radius: 4px;
+            height: auto;
+        }
+        /* 美化滑桿樣式 */
+        input[type="range"] {
+            -webkit-appearance: none;
+            height: 7px;
+            background: #ddd;
+            border-radius: 5px;
+            background-image: linear-gradient(#666, #666);
+            background-repeat: no-repeat;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 15px;
+            width: 15px;
+            border-radius: 50%;
+            background: #666;
+            cursor: pointer;
+            transition: background .3s ease-in-out;
+        }
+        input[type="range"]::-moz-range-thumb {
+            height: 15px;
+            width: 15px;
+            border-radius: 50%;
+            background: #666;
+            cursor: pointer;
+            transition: background .3s ease-in-out;
+            border: none;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover {
+            background: #333;
+        }
+        select {
+            padding: 8px;
+            font-size: 16px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .image-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .image-container img {
+            display: block;
+            max-width: 100%;
+            margin: 0 auto 20px;
+            border-radius: 4px;
+        }
+        .image-container img:last-child {
+            margin-bottom: 0;
+        }
+        .chapter-info {
+            font-size: 18px;
+            font-weight: bold;
+            margin-right: auto;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-size: 18px;
+            color: #666;
+        }
+        #scrollTop {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: none;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+        #scrollTop:hover {
+            opacity: 1;
+        }
+        /* 選單樣式優化 */
+        select:hover {
+            border-color: #999;
+        }
+        select:focus {
+            outline: none;
+            border-color: #666;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
+        /* 載入動畫 */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            margin: 20px auto;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="controls">
+            <select id="categorySelect">
+                <option value="">選擇漫畫</option>
+            </select>
+            <select id="chapterSelect" disabled>
+                <option value="">選擇章節</option>
+            </select>
+            <div class="chapter-info" id="chapterInfo"></div>
+            <div class="width-control">
+                <label for="widthRange">圖片寬度:</label>
+                <input type="range" id="widthRange" min="20" max="60" value="40" 
+                    oninput="updateWidth(this.value)">
+                <input type="number" id="widthNumber" min="20" max="60" value="40" 
+                    onchange="updateWidth(this.value)">
+                <span>rem</span>
+            </div>
+        </div>
+        <div class="image-container" id="imageContainer"></div>
+    </div>
+    <button id="scrollTop" title="回到頂部">↑</button>
+
+    <script>
+        let currentImages = [];
+        let observer;
+
+        // 初始化 Intersection Observer
+        function initializeObserver() {
+            observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        if (img.dataset.src) {
+                            img.src = img.dataset.src;
+                            img.removeAttribute('data-src');
+                            observer.unobserve(img);
+                        }
+                    }
+                });
+            }, {
+                rootMargin: '50px 0px',
+                threshold: 0.1
+            });
+        }
+
+        // 載入漫畫類別
+        async function loadCategories() {
+            try {
+                const response = await fetch('/api/categories');
+                const categories = await response.json();
+                const select = document.getElementById('categorySelect');
+                categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category;
+                    option.textContent = category;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading categories:', error);
+            }
+        }
+
+        // 載入章節
+        async function loadChapters(category, selectedChapter = null) {
+            try {
+                const response = await fetch(`/api/chapters/${category}`);
+                const chapters = await response.json();
+                const select = document.getElementById('chapterSelect');
+                select.innerHTML = '<option value="">選擇章節</option>';
+                select.disabled = false;
+                
+                chapters.forEach(chapter => {
+                    const option = document.createElement('option');
+                    option.value = chapter;
+                    option.textContent = `第 ${chapter} 章`;
+                    select.appendChild(option);
+                });
+
+                // 如果有指定章節，則選中它
+                if (selectedChapter) {
+                    select.value = selectedChapter;
+                    await loadImages(category, selectedChapter);
+                }
+            } catch (error) {
+                console.error('Error loading chapters:', error);
+            }
+        }
+
+        // 載入圖片
+        async function loadImages(category, chapter, scrollToPosition = 0) {
+            const container = document.getElementById('imageContainer');
+            container.innerHTML = '<div class="spinner"></div>';
+            
+            try {
+                const response = await fetch(`/api/images/${category}/${chapter}`);
+                currentImages = await response.json();
+                
+                // 更新章節資訊
+                document.getElementById('chapterInfo').textContent = 
+                    `${category} - 第 ${chapter} 章 (共 ${currentImages.length} 頁)`;
+                
+                // 清空容器
+                container.innerHTML = '';
+                
+                // 建立所有圖片元素
+                currentImages.forEach((image, index) => {
+                    const img = document.createElement('img');
+                    const imagePath = `/comics/${category}/${chapter}/${image}`;
+                    
+                    // 設定懶加載
+                    if (index < 5) {
+                        // 前5張圖片直接載入
+                        img.src = imagePath;
+                    } else {
+                        // 其餘圖片使用懶加載
+                        img.dataset.src = imagePath;
+                        img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; // 透明佔位圖
+                    }
+                    
+                    img.alt = `Page ${index + 1}`;
+                    container.appendChild(img);
+                    
+                    if (index >= 5) {
+                        observer.observe(img);
+                    }
+                });
+
+                // 保存當前閱讀位置
+                saveReadingState(category, chapter);
+
+                // 如果有指定捲動位置，等待圖片載入後捲動
+                if (scrollToPosition > 0) {
+                    const firstImage = container.querySelector('img');
+                    if (firstImage) {
+                        firstImage.onload = () => {
+                            window.scrollTo(0, scrollToPosition);
+                        };
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading images:', error);
+                container.innerHTML = '<div class="loading">載入失敗，請重試</div>';
+            }
+        }
+
+        // 保存閱讀狀態
+        function saveReadingState(category, chapter) {
+            const state = {
+                category,
+                chapter,
+                scrollPosition: window.pageYOffset || document.documentElement.scrollTop
+            };
+            localStorage.setItem('comicReadingState', JSON.stringify(state));
+        }
+
+        // 載入保存的閱讀狀態
+        async function loadSavedState() {
+            const savedState = localStorage.getItem('comicReadingState');
+            if (savedState) {
+                const state = JSON.parse(savedState);
+                const categorySelect = document.getElementById('categorySelect');
+                
+                // 設定漫畫類別
+                if (state.category) {
+                    categorySelect.value = state.category;
+                    // 載入章節並選中保存的章節
+                    if (state.chapter) {
+                        await loadChapters(state.category, state.chapter);
+                        // 捲動到保存的位置
+                        if (state.scrollPosition) {
+                            setTimeout(() => {
+                                window.scrollTo(0, state.scrollPosition);
+                            }, 100);
+                        }
+                    }
+                }
+            }
+        }
+
+        // 回到頂部按鈕控制
+        window.onscroll = function() {
+            const scrollTopBtn = document.getElementById('scrollTop');
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                scrollTopBtn.style.display = 'block';
+            } else {
+                scrollTopBtn.style.display = 'none';
+            }
+        };
+
+        // 回到頂部功能
+        document.getElementById('scrollTop').addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // 事件監聽器
+        document.getElementById('categorySelect').addEventListener('change', (e) => {
+            if (e.target.value) {
+                loadChapters(e.target.value);
+                document.getElementById('chapterInfo').textContent = '';
+                document.getElementById('imageContainer').innerHTML = '';
+            } else {
+                document.getElementById('chapterSelect').disabled = true;
+                document.getElementById('chapterSelect').innerHTML = 
+                    '<option value="">選擇章節</option>';
+                document.getElementById('chapterInfo').textContent = '';
+                document.getElementById('imageContainer').innerHTML = '';
+                // 清除保存的狀態
+                localStorage.removeItem('comicReadingState');
+            }
+        });
+
+        document.getElementById('chapterSelect').addEventListener('change', (e) => {
+            if (e.target.value) {
+                const category = document.getElementById('categorySelect').value;
+                loadImages(category, e.target.value);
+            } else {
+                document.getElementById('imageContainer').innerHTML = '';
+                document.getElementById('chapterInfo').textContent = '';
+                // 清除保存的狀態
+                localStorage.removeItem('comicReadingState');
+            }
+        });
+
+        // 定期保存捲動位置
+        let scrollTimeout;
+        window.addEventListener('scroll', () => {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                const category = document.getElementById('categorySelect').value;
+                const chapter = document.getElementById('chapterSelect').value;
+                if (category && chapter) {
+                    saveReadingState(category, chapter);
+                }
+            }, 100);
+        });
+
+        // 更新圖片寬度
+        function updateWidth(value) {
+            // 確保值在有效範圍內
+            value = Math.max(10, Math.min(100, value));
+            
+            // 更新滑桿和數字輸入框的值
+            document.getElementById('widthRange').value = value;
+            document.getElementById('widthNumber').value = value;
+            
+            // 更新滑桿的背景
+            const widthRange = document.getElementById('widthRange');
+            const percentage = (value - widthRange.min) / (widthRange.max - widthRange.min) * 100;
+            widthRange.style.backgroundSize = percentage + '% 100%';
+            
+            // 更新所有圖片的寬度
+            const images = document.querySelectorAll('.image-container img');
+            images.forEach(img => {
+                img.style.width = value + '%';
+            });
+            
+            // 保存設定到 localStorage
+            localStorage.setItem('comicImageWidth', value);
+        }
+
+        // 載入保存的寬度設定
+        function loadSavedWidth() {
+            const savedWidth = localStorage.getItem('comicImageWidth');
+            if (savedWidth) {
+                updateWidth(savedWidth);
+            } else {
+                updateWidth(50); // 預設值
+            }
+        }
+
+        // 初始化
+        async function initialize() {
+            initializeObserver();
+            await loadCategories();
+            loadSavedWidth();
+            await loadSavedState();
+            loadSavedWidth();
+
+            // 更新滑桿背景的初始狀態
+            const widthRange = document.getElementById('widthRange');
+            widthRange.style.backgroundSize = '100% 100%';
+        }
+
+        initialize();
+    </script>
+</body>
+</html>

@@ -1,87 +1,35 @@
-# main_page = 'https://18comic.org/album/188259/'
-
-# download_page_1 = 'https://18comic.org/album_download/188259'
-# download_url_1 = 'https://dlzip.18comic.org/download_zip/188259?md5=r6J8bdYow9bvN5TENTJSJw&expires=1667529640&aid=188259'
-
-# download_page_2 = 'https://18comic.org/album_download/326117'
-# download_url_2 = 'https://dlzip.18comic.org/download_zip/326117?md5=xS6V3cAZsjLvs4vz2Rf8ZA&expires=1667529684&aid=326117'
-
-# download_page_3 = 'https://18comic.org/album_download/190168'
-# download_url_3 = ''
-
-# import requests
-# import cv2
-# import numpy as np
-
-# res = requests.get('https://18comic.org/captcha/0.1', headers={'Referer':'https://18comic.org/album_download/190168',
-#                                                          'Accept':'image/avif,image/webp,*/*',
-#                                                          'Accept-Encoding':'gzip, deflate, br'})
-# img_arr = np.asarray(bytearray(res.content),dtype=np.uint8)
-# img = cv2.imdecode(img_arr, cv2.IMREAD_UNCHANGED)
-# cv2.imshow('Captcha', img)
-# cv2.waitKey(0)
-# cv2.destroyAllWindows()
 import os
 from pathlib import Path
 from typing import Union
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
+from jinja2 import Environment, FileSystemLoader
 
 app = FastAPI()
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory="./viewer/static"), name="static")
+app.mount("/viewer/comic", StaticFiles(directory="./viewer/comic"), name="comic")
+
+env = Environment(loader=FileSystemLoader('./viewer/templates'))
+comic_env = Environment(loader=FileSystemLoader('./viewer/comic'))
 
 @app.get('/', response_class=HTMLResponse)
 async def index(req: Request):
-  ver_dir = Path('static')
-  img_paths = [p for p in list(ver_dir.rglob('*')) if not p.is_dir() and not p.name.split('.')[-1] in ['css','js']]
-  img_paths.sort(key=lambda x: int(x.parent.name.split('_')[0]))
-  img_eles = [f'<div class="img-block"><img src="{path}"></div>' for path in img_paths if not path.is_dir()]
-  html = f"""
-  <!DOCTYPE html>
-    <html lang="zh-tw">
+    page = env.get_template('index.html')
+    comic_folder_list = list(Path('./viewer/comic').glob('*'))
+    return page.render(comic_list=''.join([p.stem for p in comic_folder_list]))
 
-    <head>
-      <meta charset="utf-8" />
-      <title>Comic Viewer</title>
-    </head>
-
-    <body style="background-color: #FFFFFF;">
-      <div class="pages">{''.join(img_eles)}</div>
-    </body>
-    <link rel="stylesheet" href="static/css/comic.css">
-    </html>
-  """
-  return html
-
-
-# @app.get("/comic")
-# def read_item(q: Union[str, None] = None):
-#   imgs = os.listdir('F:/Study/妹妹的義務/25_219293')
-#   print(imgs)
-#   html = '''
-#   <!DOCTYPE html>
-#   <html lang="zh-tw">
-
-#   <head>
-#     <meta charset="utf-8" />
-#     <title>Comic Viewer</title>
-#   </head>
-
-#   <body style="background-color: #FFFFFF;">
-#     <script>
-      
-#     </script>
-#   </body>
-#   '''
-#   return
-
+@app.get('/{comic_name}', response_class=HTMLResponse)
+async def index(req: Request, comic_name: str):
+    page = comic_env.get_template(f'{comic_name}/{comic_name}.html')
+    comic_folder_list = list(Path('./viewer/comic').glob('*'))
+    return page.render(comic_list=''.join([p.stem for p in comic_folder_list]))
 
 if __name__ == "__main__":
-  import uvicorn
-  uvicorn.run('comic:app',
-              host='localhost',
-              port=3000,
-              reload=True,
-              log_level='debug')
+    import uvicorn
+    uvicorn.run('viewer.comic:app',
+                host='localhost',
+                port=4000,
+                reload=True,
+                log_level='debug')

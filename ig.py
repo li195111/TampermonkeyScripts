@@ -54,6 +54,10 @@ if __name__ == '__main__':
                                    'title': title,
                                    'name': fname,
                                    'type': ftype}) or {}
+                doc_width = doc.get('width')
+                doc_height = doc.get('height')
+                doc_size = doc.get('size')
+
                 old_docs = list(h.query({'dir_name': dir_name,
                                          'title': title,
                                          'name': fname,
@@ -62,14 +66,21 @@ if __name__ == '__main__':
                     old_doc = old_docs[0]
                 else:
                     old_doc = {}
-                if not doc.get('width') is None and not doc.get('height') is None and not doc.get('size') is None:
-                    media_infos = {'width': doc.get('width'), 'height': doc.get(
-                        'height'), 'size': doc.get('size')}
-                elif not old_doc.get('width') is None and not old_doc.get('height') is None and not old_doc.get('size') is None:
-                    media_infos = {'width': old_doc.get('width'), 'height': old_doc.get(
-                        'height'), 'size': old_doc.get('size')}
+                old_doc_width = old_doc.get('width')
+                old_doc_height = old_doc.get('height')
+                old_doc_size = old_doc.get('size')
+
+                if not doc_width is None and not doc_height is None and not doc_size is None:
+                    media_infos = {'width': doc_width,
+                                   'height': doc_height,
+                                   'size': doc_size}
+                elif not old_doc_width is None and not old_doc_height is None and not old_doc_size is None:
+                    media_infos = {'width': old_doc_width,
+                                   'height': old_doc_height,
+                                   'size': old_doc_size}
                 else:
                     media_infos = {}
+
                 if len(media_infos) == 0 or not media_infos.get('width') or not media_infos.get('height'):
                     fp = f.as_posix()
                     try:
@@ -124,21 +135,21 @@ if __name__ == '__main__':
                     doc['type'] = ftype
                     update = True
 
-                old_width = doc.get('width')
+                old_width = doc_width
                 if old_width != media_infos.get('width'):
                     # log.info(
                     #     f'Update At width: {doc.get("width")} {media_infos.get("width")}')
                     doc['width'] = media_infos.get('width')
                     update = True
 
-                old_height = doc.get('height')
+                old_height = doc_height
                 if old_height != media_infos.get('height'):
                     # log.info(
                     #     f'Update At height: {doc.get("height")} {media_infos.get("height")}')
                     doc['height'] = media_infos.get('height')
                     update = True
 
-                old_size = doc.get('size')
+                old_size = doc_size
                 if old_size != media_infos.get('size'):
                     # log.info(
                     #     f'Update At size: {doc.get("size")} {media_infos.get("size")}')

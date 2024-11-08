@@ -28,9 +28,12 @@ if __name__ == '__main__':
 
     docs = []
     media_types = ['*']
-    for p in tqdm(ig_users, desc='IG User Progress'):
+    desc = 'IG User Progress'
+    progress = tqdm(ig_users, desc=desc)
+    for p in progress:
         update = False
         dir_name = p.name
+        progress.set_description(f'{desc} {dir_name}')
         parent = p.parent.name
 
         name_split = p.name.split('_')

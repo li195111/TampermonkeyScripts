@@ -92,7 +92,6 @@ if __name__ == '__main__':
                                 # Empty file path, try use PIL ...
                                 media_infos = get_image_infos_pil(fp)
                         if not media_infos.get('width') or not media_infos.get('height'):
-                            # log.info(f'Broken file path, Remove')
                             os.remove(fp)
                             continue
                     except Exception as err:
@@ -102,57 +101,44 @@ if __name__ == '__main__':
 
                 # To Document Obj
                 if doc.get('dir_name') != dir_name:
-                    # log.info(
-                    #     f'Update At dir_name: {doc.get("dir_name")} {dir_name}')
                     doc['dir_name'] = dir_name
                     update = True
 
                 if doc.get('parent') != parent:
-                    # log.info(f'Update At parent: {doc.get("parent")} {parent}')
                     doc['parent'] = parent
                     update = True
 
                 if doc.get('source') != src:
-                    # log.info(f'Update At source: {doc.get("source")} {src}')
                     doc['source'] = src
                     update = True
 
                 old_title = doc.get('title')
                 if old_title != title:
-                    # log.info(f'Update At title: {doc.get("title")} {title}')
                     doc['title'] = title
                     update = True
 
                 old_name = doc.get('name')
                 if old_name != fname:
-                    # log.info(f'Update At name: {doc.get("name")}, {fname}')
                     doc['name'] = fname
                     update = True
 
                 old_type = doc.get('type')
                 if old_type != ftype:
-                    # log.info(f'Update At type: {doc.get("type")} {ftype}')
                     doc['type'] = ftype
                     update = True
 
                 old_width = doc_width
                 if old_width != media_infos.get('width'):
-                    # log.info(
-                    #     f'Update At width: {doc.get("width")} {media_infos.get("width")}')
                     doc['width'] = media_infos.get('width')
                     update = True
 
                 old_height = doc_height
                 if old_height != media_infos.get('height'):
-                    # log.info(
-                    #     f'Update At height: {doc.get("height")} {media_infos.get("height")}')
                     doc['height'] = media_infos.get('height')
                     update = True
 
                 old_size = doc_size
                 if old_size != media_infos.get('size'):
-                    # log.info(
-                    #     f'Update At size: {doc.get("size")} {media_infos.get("size")}')
                     doc['size'] = media_infos.get('size')
                     update = True
 

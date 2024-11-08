@@ -20,31 +20,37 @@ def get_collection(db_name: str, col_name: str):
 
 
 def get_video_infos(video_path: str):
+    media_infos = {'width': 0, 'height': 0}
     try:
         cap = cv2.VideoCapture(video_path)
-        width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
-        height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+        media_infos['width'] = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+        media_infos['height'] = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
         cap.release()
-        return {'width': width, 'height': height}
+        return media_infos
     except Exception:
-        return {'width': 0, 'height': 0}
+        return media_infos
 
 
 def get_image_infos(image_path: str):
-    im = cv2.imread(image_path)
-    if im is None:
-        return {'width': 0, 'height': 0}
-    height, width = im.shape[:2]
-    return {'width': width, 'height': height}
+    media_infos = {'width': 0, 'height': 0}
+    try:
+        im = cv2.imread(image_path)
+        if im is None:
+            return media_infos
+        media_infos['height'], media_infos['width'] = im.shape[:2]
+        return media_infos
+    except Exception:
+        return media_infos
 
 
 def get_image_infos_pil(image_path: str):
+    media_infos = {'width': 0, 'height': 0}
     try:
         im: Image.Image = Image.open(image_path)
-        width, height = im.size
-        return {'width': width, 'height': height}
+        media_infos['width'], media_infos['height'] = im.size
+        return media_infos
     except Exception:
-        return {'width': 0, 'height': 0}
+        return media_infos
 
 
 def split_tags(ts, results=[]):

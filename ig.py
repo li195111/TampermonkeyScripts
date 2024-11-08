@@ -86,6 +86,7 @@ if __name__ == '__main__':
                             continue
                     except Exception as err:
                         log.info(err)
+                        sys.exit(1)
                     media_infos['size'] = os.path.getsize(fp)
 
                 # To Document Obj

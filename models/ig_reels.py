@@ -121,7 +121,7 @@ class Item(IBase):
   should_request_ads: bool
   is_visual_reply_commenter_notice_enabled: bool
   commerciality_status: CommercialityStatus
-  explore_hide_comments: bool
+  explore_hide_comments: Optional[bool] = None
   shop_routing_user_id: Optional[str] = None
   can_see_insights_as_brand: bool
   is_organic_product_tagging_eligible: bool
@@ -129,11 +129,11 @@ class Item(IBase):
   media_type: int
   code: str
   caption: Optional[str] = None
-  clips_tab_pinned_user_ids: List[Any]
-  comment_inform_treatment: CommentInformTreatment
+  clips_tab_pinned_user_ids: Optional[List[Any]] = None
+  comment_inform_treatment: Optional[CommentInformTreatment] = None
   sharing_friction_info: SharingFrictionInfo
   has_translation: bool
-  original_media_has_visual_reply_media: bool
+  original_media_has_visual_reply_media: Optional[bool] = None
   can_viewer_save: bool
   is_in_profile_grid: bool
   profile_grid_control_enabled: bool
@@ -150,7 +150,7 @@ class Item(IBase):
   crosspost: Optional[List[Crosspost]] = None
   is_open_to_public_submission: bool
   has_delayed_metadata: Optional[bool] = None
-  is_auto_created: bool
+  is_auto_created: Optional[bool] = None
   is_cutout_sticker_allowed: bool
   is_dash_eligible: Optional[int] = None
   video_dash_manifest: Optional[str] = None
@@ -174,7 +174,7 @@ class Item(IBase):
   story_bloks_stickers: Optional[List[StoryBloksSticker]] = None
   has_liked: bool
   supports_reel_reactions: bool
-  can_send_custom_emojis: bool
+  can_send_custom_emojis: Optional[bool] = None
   show_one_tap_fb_share_tooltip: bool
   accessibility_caption: Optional[str] = None
   attribution_content_url: Optional[str] = None

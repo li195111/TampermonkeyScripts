@@ -17,9 +17,9 @@ class DisabledReplyType(Enum):
 
 
 class RankerScores(IBase):
-  ptap: float
-  fp: float
-  vm: float
+  ptap: Optional[float] = None
+  fp: Optional[float] = None
+  vm: Optional[float] = None
 
 class ReelType(Enum):
   USER_REEL = "user_reel"
@@ -46,7 +46,7 @@ class User(IBase):
   is_verified: bool
   profile_pic_id: Optional[str] = None
   profile_pic_url: str
-  birthday_today_visibility_for_viewer: BirthdayTodayVisibilityForViewer
+  birthday_today_visibility_for_viewer: Optional[BirthdayTodayVisibilityForViewer] = None
   friendship_status: FriendshipStatus
 
 class Tray(IBase):

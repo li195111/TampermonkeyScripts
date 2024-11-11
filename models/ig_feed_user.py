@@ -513,7 +513,7 @@ class Item(IBase):
   clips_tab_pinned_user_ids: List[Any]
   comment_inform_treatment: CommentInformTreatment
   sharing_friction_info: SharingFrictionInfo
-  original_media_has_visual_reply_media: bool
+  original_media_has_visual_reply_media: Optional[bool] = None
   fb_user_tags: Tags
   invited_coauthor_producers: List[Any]
   all_previous_submitters: Optional[List[Any]] = None
@@ -550,7 +550,7 @@ class Item(IBase):
   hide_view_all_comment_entrypoint: Optional[bool] = None
   inline_composer_display_condition: Optional[str] = None
   has_delayed_metadata: Optional[bool] = None
-  is_auto_created: bool
+  is_auto_created: Optional[bool] = None
   is_quiet_post: bool
   is_cutout_sticker_allowed: bool
   location: Optional[Location] = None

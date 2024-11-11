@@ -191,7 +191,7 @@ async def process_video(h: MongoHandler, doc: MongoDoc, file_path: Path, bot_tok
 
     title = file_path.absolute().parent.name[5:]
     if file_path.stat().st_size > MAX_FILE_SIZE:
-        log(f"文件大小超過限制：{file_path}")
+        log.warning(f"文件大小超過限制：{file_path}")
         return  # Skip this file
     file_size_mb = file_path.stat().st_size / (1024 * 1024)
     upload_speed_mbps = 30  # 30 Mbps

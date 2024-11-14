@@ -35,17 +35,16 @@ def init_logger(name: str, log_filename: str, level: int = 10 if os.getenv("DEBU
 
 async def download_file(file_path: Path, semaphore: Semaphore) -> Optional[Path]:
     async with semaphore:
-        try:
-            # 確保路徑是絕對路徑
-            abs_path = file_path.absolute()
+        # 確保路徑是絕對路徑
+        abs_path = file_path.absolute()
 
-            # 使用 os.path.normpath 來標準化路徑
-            normalized_path = Path(os.path.normpath(str(abs_path)))
+        # 使用 os.path.normpath 來標準化路徑
+        normalized_path = Path(os.path.normpath(str(abs_path)))
+        try:
             # 檢查路徑是否合法
             if not abs_path.exists():
                 print(f"文件不存在: {abs_path}")
                 return normalized_path
-
 
             async with aiofiles.open(normalized_path, mode='rb') as file:
                 await file.read()  # 模擬文件讀取操作
@@ -54,17 +53,17 @@ async def download_file(file_path: Path, semaphore: Semaphore) -> Optional[Path]
         except FileNotFoundError as e:
             print(f"文件未找到: {file_path}")
             print(f"錯誤詳情: {str(e)}")
-            return None
+            return normalized_path
 
         except OSError as e:
             print(f"OS錯誤 {e.errno}: {file_path}")
             print(f"錯誤詳情: {str(e)}")
-            return None
+            return normalized_path
 
         except Exception as e:
             print(f"未預期的錯誤: {str(e)}")
             print(f"錯誤類型: {type(e).__name__}")
-            return None
+            return normalized_path
 
 
 class DownloadManager:

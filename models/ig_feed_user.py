@@ -402,11 +402,15 @@ class Comment(IBase):
   comment_like_count: int
   parent_comment_id: Optional[str] = None
 
+class SmartFrame(IBase):
+  width: int
+  height: int
+  url: str
 
 class AdditionalCandidates(IBase):
   igtv_first_frame: HDProfilePicURLInfo
   first_frame: HDProfilePicURLInfo
-  smart_frame: Optional[str] = None
+  smart_frame: Optional[Union[str, SmartFrame]] = None
 
 
 class DefaultObj(IBase):

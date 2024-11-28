@@ -21,6 +21,6 @@ if __name__ == '__main__':
             bot = URLDownloadBot(BotType.EYNY,
                                  src_dir,
                                  dst_dir,
-                                 max_queue=10,
-                                 max_threads=10)
+                                 max_queue=20,
+                                 max_threads=20)
             bot.run()

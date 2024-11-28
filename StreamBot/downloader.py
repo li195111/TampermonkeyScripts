@@ -40,14 +40,13 @@ class Stream(IStream):
                   encoding='utf-8') as hfp:
             header_data = json.load(hfp)
         headers = {
-            'Host': 'video.eyny.com',
+            'Host': 'a460.static-file.com:8080',
             'Accept': '*/*',
             'Accept-Language': 'zh-TW,zh;q=0.8,en-US;q=0.5,en;q=0.3',
             'Accept-Encoding': 'gzip, deflate',
             'User-Agent':
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:133.0) Gecko/20100101 Firefox/133.0',
             'DNT': '1',
-            'Alt-Used': 'video.eyny.com',
             'Connection': 'keep-alive',
             **header_data
         }

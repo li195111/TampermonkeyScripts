@@ -206,7 +206,7 @@ class URLDownloadBot(IURLDownloadBot):
             for m in matches:
                 if m:
                     sn_code = m[0].replace(' ', '-').replace('_', '').upper()
-            if sn_code:
+            if sn_code and sn_code != 'FC2PPV':
                 exists_file = self.handler.query_one(
                     {'SN': {'$regex': re.compile(rf"{sn_code}")}})
             else:
@@ -219,6 +219,8 @@ class URLDownloadBot(IURLDownloadBot):
                 self.add_to_queue(file_path, media_type)
             elif exists_file:
                 self.logger.info(f'Remove Exists:\n{file_path.stem}')
+                self.logger.info(f'Exists SN: {sn_code}')
+                self.logger.info(f'Exists File: {exists_file}')
                 try:
                     os.remove(file_path.as_posix())
                 except PermissionError:

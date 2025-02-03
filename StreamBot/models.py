@@ -6,7 +6,7 @@ import threading
 from typing import List, Optional, Union
 from urllib.parse import urlparse
 
-from models.base import IBase, Log, LogThread
+from models.base import Error, IBase, Log, LogThread
 
 from .enums import FileSizeLevel, FileState, MediaType
 from .utils import count_bytes_level
